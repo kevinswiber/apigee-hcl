@@ -15,6 +15,14 @@ proxy_endpoint "default" {
     }
   }
 
+  flow "TokenEndpoint" {
+    condition = "proxy.pathsuffix MatchesPath \"/accesstoken\""
+
+    request {
+      step "GenerateAccessToken" {}
+    }
+  }
+
   http_proxy_connection {
     base_path    = "/v0/hello"
     virtual_host = ["default", "secure"]

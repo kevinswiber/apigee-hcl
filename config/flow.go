@@ -113,6 +113,7 @@ func loadFlowsHCL(list *ast.ObjectList) ([]*Flow, error) {
 			flow.Response.Steps = steps
 		}
 
+		flow.Name = item.Keys[0].Token.Value().(string)
 		result = append(result, &flow)
 	}
 
