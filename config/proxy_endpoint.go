@@ -9,30 +9,12 @@ import (
 
 type ProxyEndpoint struct {
 	XMLName             string               `xml:"ProxyEndpoint" hcl:",-"`
-	Name                string               `xml:"name,attr" hcl:",-"`
+	Name                string               `xml:",attr" hcl:",-"`
 	PreFlow             *PreFlow             `hcl:"pre_flow"`
-	Flows               *Flows               `hcl:"flows"`
+	Flows               []*Flow              `hcl:"flows"`
 	PostFlow            *PostFlow            `hcl:"post_flow"`
 	HTTPProxyConnection *HTTPProxyConnection `hcl:"http_proxy_connection"`
 	RouteRules          []*RouteRule         `xml:"RouteRule" hcl:"route_rule"`
-}
-
-type PreFlow struct {
-	XMLName  string       `xml:"PreFlow" hcl:",-"`
-	Request  FlowRequest  `hcl:"request"`
-	Response FlowResponse `hcl:"response"`
-}
-
-type Flows struct {
-	XMLName  string       `xml:"Flows" hcl:",-"`
-	Request  FlowRequest  `hcl:"request"`
-	Response FlowResponse `hcl:"response"`
-}
-
-type PostFlow struct {
-	XMLName  string       `xml:"PostFlow" hcl:",-"`
-	Request  FlowRequest  `hcl:"request"`
-	Response FlowResponse `hcl:"response"`
 }
 
 type HTTPProxyConnection struct {
@@ -49,7 +31,7 @@ type RouteRule struct {
 	URL            string `xml:",omitempty" hcl:"url"`
 }
 
-func loadProxyEndpointsHcl(list *ast.ObjectList) ([]*ProxyEndpoint, error) {
+func loadProxyEndpointsHCL(list *ast.ObjectList) ([]*ProxyEndpoint, error) {
 	var result []*ProxyEndpoint
 	for _, item := range list.Items {
 		n := item.Keys[0].Token.Value().(string)
@@ -70,7 +52,7 @@ func loadProxyEndpointsHcl(list *ast.ObjectList) ([]*ProxyEndpoint, error) {
 		proxyEndpoint.Name = n
 
 		if preFlow := listVal.Filter("pre_flow"); len(preFlow.Items) > 0 {
-			preFlow, err := loadProxyEndpointPreFlowHcl(preFlow)
+			preFlow, err := loadPreFlowHCL(preFlow)
 			if err != nil {
 				return nil, err
 			}
@@ -79,12 +61,21 @@ func loadProxyEndpointsHcl(list *ast.ObjectList) ([]*ProxyEndpoint, error) {
 		}
 
 		if postFlow := listVal.Filter("post_flow"); len(postFlow.Items) > 0 {
-			postFlow, err := loadProxyEndpointPostFlowHcl(postFlow)
+			postFlow, err := loadPostFlowHCL(postFlow)
 			if err != nil {
 				return nil, err
 			}
 
 			proxyEndpoint.PostFlow = postFlow
+		}
+
+		if routeRules := listVal.Filter("route_rule"); len(routeRules.Items) > 0 {
+			routeRules, err := loadProxyEndpointRouteRulesHCL(routeRules)
+			if err != nil {
+				return nil, err
+			}
+
+			proxyEndpoint.RouteRules = routeRules
 		}
 
 		result = append(result, &proxyEndpoint)
@@ -93,74 +84,18 @@ func loadProxyEndpointsHcl(list *ast.ObjectList) ([]*ProxyEndpoint, error) {
 	return result, nil
 }
 
-func loadProxyEndpointPreFlowHcl(list *ast.ObjectList) (*PreFlow, error) {
-	var result PreFlow
-	item := list.Items[0]
+func loadProxyEndpointRouteRulesHCL(list *ast.ObjectList) ([]*RouteRule, error) {
+	var result []*RouteRule
 
-	var listVal *ast.ObjectList
-	if ot, ok := item.Val.(*ast.ObjectType); ok {
-		listVal = ot.List
-	} else {
-		return nil, fmt.Errorf("pre flow item not an object")
-	}
-
-	if request := listVal.Filter("request"); len(request.Items) > 0 {
-		item := request.Items[0]
-
-		steps, err := loadFlowSteps(item)
-		if err != nil {
-			return nil, err
+	for _, item := range list.Items {
+		var rule RouteRule
+		if err := hcl.DecodeObject(&rule, item.Val); err != nil {
+			return nil, fmt.Errorf("error decoding route rule object")
 		}
+		rule.Name = item.Keys[0].Token.Value().(string)
 
-		result.Request.Steps = steps
+		result = append(result, &rule)
 	}
 
-	if response := listVal.Filter("response"); len(response.Items) > 0 {
-		item := response.Items[0]
-
-		steps, err := loadFlowSteps(item)
-		if err != nil {
-			return nil, err
-		}
-
-		result.Response.Steps = steps
-	}
-
-	return &result, nil
-}
-
-func loadProxyEndpointPostFlowHcl(list *ast.ObjectList) (*PostFlow, error) {
-	var result PostFlow
-	item := list.Items[0]
-
-	var listVal *ast.ObjectList
-	if ot, ok := item.Val.(*ast.ObjectType); ok {
-		listVal = ot.List
-	} else {
-		return nil, fmt.Errorf("pre flow item not an object")
-	}
-
-	if request := listVal.Filter("request"); len(request.Items) > 0 {
-		item := request.Items[0]
-
-		steps, err := loadFlowSteps(item)
-		if err != nil {
-			return nil, err
-		}
-
-		result.Request.Steps = steps
-	}
-
-	if response := listVal.Filter("response"); len(response.Items) > 0 {
-		item := response.Items[0]
-
-		steps, err := loadFlowSteps(item)
-		if err != nil {
-			return nil, err
-		}
-
-		result.Response.Steps = steps
-	}
-
-	return &result, nil
+	return result, nil
 }

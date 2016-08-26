@@ -14,7 +14,7 @@ type Proxy struct {
 	Description string `xml:",omitempty" hcl:"description"`
 }
 
-func loadProxyHcl(list *ast.ObjectList) (*Proxy, error) {
+func loadProxyHCL(list *ast.ObjectList) (*Proxy, error) {
 	//TODO: Check if more than one proxy.  Report error.
 	var item = list.Items[0]
 	n := item.Keys[0].Token.Value().(string)
