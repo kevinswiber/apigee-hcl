@@ -8,11 +8,13 @@ import (
 )
 
 type ProxyEndpoint struct {
-	XMLName string  `xml:"ProxyEndpoint" hcl:",-"`
-	Name    string  `xml:"name,attr" hcl:",-"`
-	PreFlow PreFlow `hcl:"pre_flow"`
-	//HTTPProxyConnection interface{} `hcl:"http_proxy_connection"`
-	//RouteRule           interface{} `hcl:"route_rule"`
+	XMLName             string               `xml:"ProxyEndpoint" hcl:",-"`
+	Name                string               `xml:"name,attr" hcl:",-"`
+	PreFlow             *PreFlow             `hcl:"pre_flow"`
+	Flows               *Flows               `hcl:"flows"`
+	PostFlow            *PostFlow            `hcl:"post_flow"`
+	HTTPProxyConnection *HTTPProxyConnection `hcl:"http_proxy_connection"`
+	RouteRules          []*RouteRule         `xml:"RouteRule" hcl:"route_rule"`
 }
 
 type PreFlow struct {
@@ -21,10 +23,30 @@ type PreFlow struct {
 	Response FlowResponse `hcl:"response"`
 }
 
+type Flows struct {
+	XMLName  string       `xml:"Flows" hcl:",-"`
+	Request  FlowRequest  `hcl:"request"`
+	Response FlowResponse `hcl:"response"`
+}
+
 type PostFlow struct {
 	XMLName  string       `xml:"PostFlow" hcl:",-"`
 	Request  FlowRequest  `hcl:"request"`
 	Response FlowResponse `hcl:"response"`
+}
+
+type HTTPProxyConnection struct {
+	XMLName      string   `xml:"HTTPProxyConnection", hcl:",-"`
+	BasePath     string   `hcl:"base_path"`
+	VirtualHosts []string `xml:",innerxml" hcl:"virtual_host"`
+}
+
+type RouteRule struct {
+	XMLName        string `xml:"RouteRule"`
+	Name           string `xml:",attr", hcl:",-"`
+	Condition      string `xml:",omitempty" hcl:"condition"`
+	TargetEndpoint string `hcl:"target_endpoint"`
+	URL            string `hcl:"url"`
 }
 
 func loadProxyEndpointsHcl(list *ast.ObjectList) ([]*ProxyEndpoint, error) {

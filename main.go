@@ -1,12 +1,10 @@
 package main
 
 import (
-	//"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
 	"log"
-	//"os"
 
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
@@ -38,7 +36,6 @@ func main() {
 		log.Fatalf("err: %s", err)
 	}
 
-	//fmt.Printf("%#v\n", config.Proxy)
 	var output []byte
 	if output, err = xml.MarshalIndent(config.Proxy, "", "    "); err != nil {
 		log.Fatalf("err: %s", err)
@@ -46,7 +43,6 @@ func main() {
 	fmt.Printf("%s\n", string(output))
 
 	for _, proxyEndpoint := range config.ProxyEndpoints {
-		//fmt.Printf("%#v\n", proxyEndpoint)
 		var output []byte
 		output, err := xml.MarshalIndent(proxyEndpoint, "", "    ")
 		if err != nil {
