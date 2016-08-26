@@ -50,4 +50,13 @@ func main() {
 		}
 		fmt.Printf("%s\n", string(output))
 	}
+
+	for _, targetEndpoint := range config.TargetEndpoints {
+		var output []byte
+		output, err := xml.MarshalIndent(targetEndpoint, "", "    ")
+		if err != nil {
+			log.Fatalf("err: %s", err)
+		}
+		fmt.Printf("%s\n", string(output))
+	}
 }

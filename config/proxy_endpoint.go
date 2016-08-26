@@ -11,26 +11,20 @@ type ProxyEndpoint struct {
 	XMLName             string               `xml:"ProxyEndpoint" hcl:"-"`
 	Name                string               `xml:"name,attr" hcl:"-"`
 	PreFlow             *PreFlow             `hcl:"pre_flow"`
-	Flows               []*Flow              `xml:"Flows>Flow" hcl:"flows"`
+	Flows               []*Flow              `xml:"Flows,omitempty>Flow" hcl:"flows"`
 	PostFlow            *PostFlow            `hcl:"post_flow"`
 	PostClientFlow      *PostClientFlow      `hcl:"post_client_flow"`
-	FaultRules          []*FaultRule         `xml:"FaultRules>FaultRule" hcl:"fault_rules"`
+	FaultRules          []*FaultRule         `xml:"FaultRules,omitempty>FaultRule" hcl:"fault_rules"`
 	DefaultFaultRule    *DefaultFaultRule    `hcl:"default_fault_rule"`
 	HTTPProxyConnection *HTTPProxyConnection `hcl:"http_proxy_connection"`
 	RouteRules          []*RouteRule         `xml:"RouteRule" hcl:"route_rule"`
 }
 
 type HTTPProxyConnection struct {
-	XMLName      string      `xml:"HTTPProxyConnection", hcl:"-"`
+	XMLName      string      `xml:"HTTPProxyConnection" hcl:"-"`
 	BasePath     string      `hcl:"base_path"`
 	VirtualHosts []string    `xml:"VirtualHost" hcl:"virtual_host"`
-	Properties   []*Property `xml:"Properties>Property" hcl:"properties"`
-}
-
-type Property struct {
-	XMLName string      `xml:"Property"`
-	Name    string      `xml:"name,attr" hcl:",key"`
-	Value   interface{} `xml:",chardata"`
+	Properties   []*Property `xml:"Properties,omitempty>Property" hcl:"properties"`
 }
 
 type RouteRule struct {
@@ -116,7 +110,6 @@ func loadProxyEndpointsHCL(list *ast.ObjectList) ([]*ProxyEndpoint, error) {
 		}
 
 		if hpcList := listVal.Filter("http_proxy_connection"); len(hpcList.Items) > 0 {
-			fmt.Printf("hpcList len: %d\n", len(hpcList.Items[0].Keys))
 			hpc, err := loadProxyEndpointHTTPProxyConnectionHCL(hpcList.Items[0])
 			if err != nil {
 				return nil, err
@@ -154,24 +147,14 @@ func loadProxyEndpointHTTPProxyConnectionHCL(item *ast.ObjectItem) (*HTTPProxyCo
 		return nil, fmt.Errorf("http proxy connection not an object")
 	}
 
-	if props := listVal.Filter("properties"); len(props.Items) > 0 {
-		var propsVal *ast.ObjectList
-		if ot, ok := props.Items[0].Val.(*ast.ObjectType); ok {
-			propsVal = ot.List
+	if propsList := listVal.Filter("properties"); len(propsList.Items) > 0 {
+
+		props, err := loadPropertiesHCL(propsList.Items[0])
+		if err != nil {
+			return nil, err
 		}
 
-		var newProps []*Property
-		for _, p := range propsVal.Items {
-			var val interface{}
-			if err := hcl.DecodeObject(&val, p.Val); err != nil {
-				fmt.Println("can't decode property object")
-			}
-
-			newProp := Property{Name: p.Keys[0].Token.Value().(string), Value: val}
-			newProps = append(newProps, &newProp)
-		}
-
-		hpc.Properties = newProps
+		hpc.Properties = props
 	}
 
 	return &hpc, nil
