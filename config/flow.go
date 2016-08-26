@@ -15,7 +15,7 @@ type PreFlow struct {
 
 type Flow struct {
 	XMLName   string       `xml:"Flow" hcl:",-"`
-	Name      string       `xml:",attr" hcl:",-"`
+	Name      string       `xml:"name,attr" hcl:",-"`
 	Condition string       `xml:",omitempty" hcl:"condition"`
 	Request   FlowRequest  `hcl:"request"`
 	Response  FlowResponse `hcl:"response"`

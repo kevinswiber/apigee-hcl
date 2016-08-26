@@ -9,7 +9,7 @@ import (
 
 type ProxyEndpoint struct {
 	XMLName             string               `xml:"ProxyEndpoint" hcl:",-"`
-	Name                string               `xml:",attr" hcl:",-"`
+	Name                string               `xml:"name,attr" hcl:",-"`
 	PreFlow             *PreFlow             `hcl:"pre_flow"`
 	Flows               []*Flow              `xml:"Flows>Flow", hcl:"flows"`
 	PostFlow            *PostFlow            `hcl:"post_flow"`
@@ -26,7 +26,7 @@ type HTTPProxyConnection struct {
 
 type RouteRule struct {
 	XMLName        string `xml:"RouteRule"`
-	Name           string `xml:",attr", hcl:",-"`
+	Name           string `xml:"name,attr", hcl:",-"`
 	Condition      string `xml:",omitempty" hcl:"condition"`
 	TargetEndpoint string `xml:",omitempty" hcl:"target_endpoint"`
 	URL            string `xml:",omitempty" hcl:"url"`
