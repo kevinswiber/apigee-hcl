@@ -11,9 +11,11 @@ type ProxyEndpoint struct {
 	XMLName             string               `xml:"ProxyEndpoint" hcl:"-"`
 	Name                string               `xml:"name,attr" hcl:"-"`
 	PreFlow             *PreFlow             `hcl:"pre_flow"`
-	Flows               []*Flow              `xml:"Flows>Flow", hcl:"flows"`
+	Flows               []*Flow              `xml:"Flows>Flow" hcl:"flows"`
 	PostFlow            *PostFlow            `hcl:"post_flow"`
 	PostClientFlow      *PostClientFlow      `hcl:"post_client_flow"`
+	FaultRules          []*FaultRule         `xml:"FaultRules>FaultRule" hcl:"fault_rules"`
+	DefaultFaultRule    *DefaultFaultRule    `hcl:"default_fault_rule"`
 	HTTPProxyConnection *HTTPProxyConnection `hcl:"http_proxy_connection"`
 	RouteRules          []*RouteRule         `xml:"RouteRule" hcl:"route_rule"`
 }
@@ -93,6 +95,24 @@ func loadProxyEndpointsHCL(list *ast.ObjectList) ([]*ProxyEndpoint, error) {
 			}
 
 			proxyEndpoint.PostClientFlow = postClientFlow
+		}
+
+		if faultRulesList := listVal.Filter("fault_rule"); len(faultRulesList.Items) > 0 {
+			faultRules, err := loadFaultRulesHCL(faultRulesList)
+			if err != nil {
+				return nil, err
+			}
+
+			proxyEndpoint.FaultRules = faultRules
+		}
+
+		if defaultFaultRulesList := listVal.Filter("default_fault_rule"); len(defaultFaultRulesList.Items) > 0 {
+			faultRule, err := loadDefaultFaultRuleHCL(defaultFaultRulesList.Items[0])
+			if err != nil {
+				return nil, err
+			}
+
+			proxyEndpoint.DefaultFaultRule = faultRule
 		}
 
 		if hpcList := listVal.Filter("http_proxy_connection"); len(hpcList.Items) > 0 {

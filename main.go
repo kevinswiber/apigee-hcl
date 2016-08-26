@@ -13,8 +13,8 @@ import (
 )
 
 func main() {
-	//file := "./examples/helloworld.hcl"
-	file := "./examples/conditional_policy.hcl"
+	file := "./examples/helloworld.hcl"
+	//file := "./examples/conditional_policy.hcl"
 
 	d, err := ioutil.ReadFile(file)
 	if err != nil {

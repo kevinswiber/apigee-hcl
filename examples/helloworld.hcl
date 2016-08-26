@@ -23,6 +23,29 @@ proxy_endpoint "default" {
     }
   }
 
+  post_flow {
+    response {
+      step "FakePolicy" {}
+    }
+  }
+
+  fault_rule "FaultRule1" {
+    step      "FakeFaultRuleStep"{}
+    condition = "proxy.pathsuffix MatchesPath \"/accesstoken\""
+  }
+
+  fault_rule "FaultRule2" {
+    step      "FakeFaultRuleStep"{}
+    step      "FakeFaultRuleStep2"{}
+    condition = "proxy.pathsuffix MatchesPath \"/accesstoken\""
+  }
+
+  default_fault_rule "default" {
+    step           "FakeFaultRuleStep"{}
+    condition      = "proxy.pathsuffix MatchesPath \"/accesstoken\""
+    always_enforce = true
+  }
+
   http_proxy_connection {
     base_path    = "/v0/hello"
     virtual_host = ["default", "secure"]
