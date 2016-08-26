@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
 
-	"github.com/kevinswiber/apigee-hcl/config"
+	"github.com/kevinswiber/apg-hcl/config"
 )
 
 func main() {
