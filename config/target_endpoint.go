@@ -57,8 +57,8 @@ type SSLInfo struct {
 	ClientAuthEnabled bool     `xml:",omitempty" hcl:"client_auth_enabled"`
 	KeyStore          string   `xml:",omitempty" hcl:"key_store"`
 	KeyAlias          string   `xml:",omitempty" hcl:"key_alias"`
-	Ciphers           []string `xml:"Ciphers>Cipher" hcl:"cipher"`
-	Protocols         []string `xml:"Protocols>Protocol" hcl:"protocol"`
+	Ciphers           []string `xml:"Ciphers>Cipher" hcl:"ciphers"`
+	Protocols         []string `xml:"Protocols>Protocol" hcl:"protocols"`
 }
 
 type EnvironmentVariable struct {
@@ -201,7 +201,7 @@ func loadTargetEndpointScriptTargetEnvironmentVariablesHCL(item *ast.ObjectItem)
 	for _, p := range envsVal.Items {
 		var val interface{}
 		if err := hcl.DecodeObject(&val, p.Val); err != nil {
-			fmt.Println("can't decode enverty object")
+			return nil, fmt.Errorf("can't decode environment variable object")
 		}
 
 		newEnv := EnvironmentVariable{Name: p.Keys[0].Token.Value().(string), Value: val}
@@ -249,14 +249,12 @@ func loadTargetEndpointHTTPTargetConnectionHCL(item *ast.ObjectItem) (*HTTPTarge
 
 		var lbServers []*LoadBalancerServer
 		if serversList := lbListVal.Filter("server"); len(serversList.Items) > 0 {
-			fmt.Println("got servers")
 			for _, item := range serversList.Items {
 				var s LoadBalancerServer
 				if err := hcl.DecodeObject(&s, item); err != nil {
 					return nil, err
 				}
 				s.Name = item.Keys[0].Token.Value().(string)
-				fmt.Printf("name = %s\n", s.Name)
 				lbServers = append(lbServers, &s)
 			}
 

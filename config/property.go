@@ -25,7 +25,7 @@ func loadPropertiesHCL(item *ast.ObjectItem) ([]*Property, error) {
 	for _, p := range propsVal.Items {
 		var val interface{}
 		if err := hcl.DecodeObject(&val, p.Val); err != nil {
-			fmt.Println("can't decode property object")
+			return nil, fmt.Errorf("can't decode property object")
 		}
 
 		newProp := Property{Name: p.Keys[0].Token.Value().(string), Value: val}

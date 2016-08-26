@@ -98,6 +98,15 @@ target_endpoint "default" {
 
     arguments = ["arg1", "arg2"]
   }
+
+  ssl_info {
+    enabled             = true
+    client_auth_enabled = false
+    key_store           = "ref://keystoreref"
+    key_alias           = "myKeyAlias"
+    ciphers             = ["TLS_RSA_WITH_3DES_EDE_CBC_SHA", "TLS_RSA_WITH_DES_CBC_SHA"]
+    protocols           = ["TLSv1", "TLSv1.2"]
+  }
 }
 
 policy assign_message "add-cors" {
