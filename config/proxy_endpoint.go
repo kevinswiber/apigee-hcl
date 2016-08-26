@@ -13,6 +13,7 @@ type ProxyEndpoint struct {
 	PreFlow             *PreFlow             `hcl:"pre_flow"`
 	Flows               []*Flow              `xml:"Flows>Flow", hcl:"flows"`
 	PostFlow            *PostFlow            `hcl:"post_flow"`
+	PostClientFlow      *PostClientFlow      `hcl:"post_client_flow"`
 	HTTPProxyConnection *HTTPProxyConnection `hcl:"http_proxy_connection"`
 	RouteRules          []*RouteRule         `xml:"RouteRule" hcl:"route_rule"`
 }
@@ -76,6 +77,15 @@ func loadProxyEndpointsHCL(list *ast.ObjectList) ([]*ProxyEndpoint, error) {
 			}
 
 			proxyEndpoint.PostFlow = postFlow
+		}
+
+		if postClientFlow := listVal.Filter("post_client_flow"); len(postClientFlow.Items) > 0 {
+			postClientFlow, err := loadPostClientFlowHCL(postClientFlow)
+			if err != nil {
+				return nil, err
+			}
+
+			proxyEndpoint.PostClientFlow = postClientFlow
 		}
 
 		if routeRules := listVal.Filter("route_rule"); len(routeRules.Items) > 0 {

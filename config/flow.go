@@ -27,6 +27,12 @@ type PostFlow struct {
 	Response FlowResponse `hcl:"response"`
 }
 
+type PostClientFlow struct {
+	XMLName  string       `xml:"PostClientFlow" hcl:",-"`
+	Request  FlowRequest  `hcl:"request"`
+	Response FlowResponse `hcl:"response"`
+}
+
 type FlowStep struct {
 	XMLName   string `xml:"Step"`
 	Name      string
@@ -128,7 +134,43 @@ func loadPostFlowHCL(list *ast.ObjectList) (*PostFlow, error) {
 	if ot, ok := item.Val.(*ast.ObjectType); ok {
 		listVal = ot.List
 	} else {
-		return nil, fmt.Errorf("pre flow item not an object")
+		return nil, fmt.Errorf("post flow item not an object")
+	}
+
+	if request := listVal.Filter("request"); len(request.Items) > 0 {
+		item := request.Items[0]
+
+		steps, err := loadFlowSteps(item)
+		if err != nil {
+			return nil, err
+		}
+
+		result.Request.Steps = steps
+	}
+
+	if response := listVal.Filter("response"); len(response.Items) > 0 {
+		item := response.Items[0]
+
+		steps, err := loadFlowSteps(item)
+		if err != nil {
+			return nil, err
+		}
+
+		result.Response.Steps = steps
+	}
+
+	return &result, nil
+}
+
+func loadPostClientFlowHCL(list *ast.ObjectList) (*PostClientFlow, error) {
+	var result PostClientFlow
+	item := list.Items[0]
+
+	var listVal *ast.ObjectList
+	if ot, ok := item.Val.(*ast.ObjectType); ok {
+		listVal = ot.List
+	} else {
+		return nil, fmt.Errorf("post client flow item not an object")
 	}
 
 	if request := listVal.Filter("request"); len(request.Items) > 0 {
