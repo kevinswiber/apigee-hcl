@@ -11,7 +11,7 @@ type ProxyEndpoint struct {
 	XMLName             string               `xml:"ProxyEndpoint" hcl:",-"`
 	Name                string               `xml:",attr" hcl:",-"`
 	PreFlow             *PreFlow             `hcl:"pre_flow"`
-	Flows               []*Flow              `xml:"Flows", hcl:"flows"`
+	Flows               []*Flow              `xml:"Flows>Flow", hcl:"flows"`
 	PostFlow            *PostFlow            `hcl:"post_flow"`
 	HTTPProxyConnection *HTTPProxyConnection `hcl:"http_proxy_connection"`
 	RouteRules          []*RouteRule         `xml:"RouteRule" hcl:"route_rule"`
