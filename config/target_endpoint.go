@@ -18,6 +18,7 @@ type TargetEndpoint struct {
 	HTTPTargetConnection  *HTTPTargetConnection  `hcl:"http_target_connection"`
 	LocalTargetConnection *LocalTargetConnection `xml:",omitempty" hcl:"local_target_connection"`
 	ScriptTarget          *ScriptTarget          `xml:",omitempty" hcl:"script_target"`
+	SSLInfo               *SSLInfo               `xml:",omitempty" hcl:"ssl_info"`
 }
 
 type HTTPTargetConnection struct {
@@ -47,6 +48,17 @@ type ScriptTarget struct {
 	ResourceURL          string                 `hcl:"resource_url"`
 	EnvironmentVariables []*EnvironmentVariable `xml:"EnvironmentVariables>EnvironmentVariable" hcl:"environment_variables"`
 	Arguments            []string               `xml:"Arguments>Argument" hcl:"arguments"`
+}
+
+type SSLInfo struct {
+	XMLName           string   `xml:"SSLInfo" hcl:"-"`
+	Enabled           bool     `xml:",omitempty" hcl:"enabled"`
+	TrustStore        string   `xml:",omitempty" hcl:"trust_store"`
+	ClientAuthEnabled bool     `xml:",omitempty" hcl:"client_auth_enabled"`
+	KeyStore          string   `xml:",omitempty" hcl:"key_store"`
+	KeyAlias          string   `xml:",omitempty" hcl:"key_alias"`
+	Ciphers           []string `xml:"Ciphers>Cipher" hcl:"cipher"`
+	Protocols         []string `xml:"Protocols>Protocol" hcl:"protocol"`
 }
 
 type EnvironmentVariable struct {
