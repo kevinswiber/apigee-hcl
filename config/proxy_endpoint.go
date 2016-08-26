@@ -36,17 +36,17 @@ type PostFlow struct {
 }
 
 type HTTPProxyConnection struct {
-	XMLName      string   `xml:"HTTPProxyConnection", hcl:",-"`
-	BasePath     string   `hcl:"base_path"`
-	VirtualHosts []string `xml:",innerxml" hcl:"virtual_host"`
+	XMLName     string   `xml:"HTTPProxyConnection", hcl:",-"`
+	BasePath    string   `hcl:"base_path"`
+	VirtualHost []string `xml:",innerxml" hcl:"virtual_host"`
 }
 
 type RouteRule struct {
 	XMLName        string `xml:"RouteRule"`
 	Name           string `xml:",attr", hcl:",-"`
 	Condition      string `xml:",omitempty" hcl:"condition"`
-	TargetEndpoint string `hcl:"target_endpoint"`
-	URL            string `hcl:"url"`
+	TargetEndpoint string `xml:",omitempty" hcl:"target_endpoint"`
+	URL            string `xml:",omitempty" hcl:"url"`
 }
 
 func loadProxyEndpointsHcl(list *ast.ObjectList) ([]*ProxyEndpoint, error) {
@@ -70,7 +70,7 @@ func loadProxyEndpointsHcl(list *ast.ObjectList) ([]*ProxyEndpoint, error) {
 		proxyEndpoint.Name = n
 
 		if preFlow := listVal.Filter("pre_flow"); len(preFlow.Items) > 0 {
-			proxyEndpoint.PreFlow = PreFlow{}
+			proxyEndpoint.PreFlow = &PreFlow{}
 			preFlowItem := preFlow.Items[0]
 
 			var preFlowItemVal *ast.ObjectList
