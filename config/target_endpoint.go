@@ -8,22 +8,23 @@ import (
 )
 
 type TargetEndpoint struct {
-	XMLName              string                `xml:"TargetEndpoint" hcl:"-"`
-	Name                 string                `xml:"name,attr" hcl:"-"`
-	PreFlow              *PreFlow              `hcl:"pre_flow"`
-	Flows                []*Flow               `xml:"Flows,omitempty>Flow" hcl:"flows"`
-	PostFlow             *PostFlow             `hcl:"post_flow"`
-	FaultRules           []*FaultRule          `xml:"FaultRules,omitempty>FaultRule" hcl:"fault_rules"`
-	DefaultFaultRule     *DefaultFaultRule     `hcl:"default_fault_rule"`
-	HTTPTargetConnection *HTTPTargetConnection `hcl:"http_target_connection"`
+	XMLName               string                 `xml:"TargetEndpoint" hcl:"-"`
+	Name                  string                 `xml:"name,attr" hcl:"-"`
+	PreFlow               *PreFlow               `hcl:"pre_flow"`
+	Flows                 []*Flow                `xml:"Flows,omitempty>Flow" hcl:"flows"`
+	PostFlow              *PostFlow              `hcl:"post_flow"`
+	FaultRules            []*FaultRule           `xml:"FaultRules,omitempty>FaultRule" hcl:"fault_rules"`
+	DefaultFaultRule      *DefaultFaultRule      `hcl:"default_fault_rule"`
+	HTTPTargetConnection  *HTTPTargetConnection  `hcl:"http_target_connection"`
+	LocalTargetConnection *LocalTargetConnection `xml:",omitempty" hcl:"local_target_connection"`
+	ScriptTarget          *ScriptTarget          `xml:",omitempty" hcl:"script_target"`
 }
 
 type HTTPTargetConnection struct {
-	XMLName               string                 `xml:"HTTPTargetConnection" hcl:"-"`
-	URL                   string                 `hcl:"url"`
-	LoadBalancer          *LoadBalancer          `hcl:"load_balancer"`
-	LocalTargetConnection *LocalTargetConnection `xml:",omitempty" hcl:"local_target_connection"`
-	Properties            []*Property            `xml:"Properties,omitempty>Property" hcl:"properties"`
+	XMLName      string        `xml:"HTTPTargetConnection" hcl:"-"`
+	URL          string        `hcl:"url"`
+	LoadBalancer *LoadBalancer `hcl:"load_balancer"`
+	Properties   []*Property   `xml:"Properties>Property" hcl:"properties"`
 }
 
 type LoadBalancer struct {
@@ -39,6 +40,19 @@ type LocalTargetConnection struct {
 	APIProxy      string `xml:",omitempty" hcl:"api_proxy"`
 	ProxyEndpoint string `xml:",omitempty" hcl:"proxy_endpoint"`
 	Path          string `xml:",omitempty" hcl:"path"`
+}
+
+type ScriptTarget struct {
+	XMLName              string                 `xml:"ScriptTarget" hcl:"-"`
+	ResourceURL          string                 `hcl:"resource_url"`
+	EnvironmentVariables []*EnvironmentVariable `xml:"EnvironmentVariables>EnvironmentVariable" hcl:"environment_variables"`
+	Arguments            []string               `xml:"Arguments>Argument" hcl:"arguments"`
+}
+
+type EnvironmentVariable struct {
+	XMLName string      `xml:"EnvironmentVariable" hcl:"-"`
+	Name    string      `xml:"name,attr" hcl:",key"`
+	Value   interface{} `xml:",chardata" hcl:"-"`
 }
 
 type LoadBalancerServer struct {
@@ -122,10 +136,67 @@ func loadTargetEndpointsHCL(list *ast.ObjectList) ([]*TargetEndpoint, error) {
 			targetEndpoint.HTTPTargetConnection = htc
 		}
 
+		if scriptTargetList := listVal.Filter("script_target"); len(scriptTargetList.Items) > 0 {
+			st, err := loadTargetEndpointScriptTargetHCL(scriptTargetList.Items[0])
+			if err != nil {
+				return nil, err
+			}
+
+			targetEndpoint.ScriptTarget = st
+		}
+
 		result = append(result, &targetEndpoint)
 	}
 
 	return result, nil
+}
+
+func loadTargetEndpointScriptTargetHCL(item *ast.ObjectItem) (*ScriptTarget, error) {
+	var st ScriptTarget
+
+	if err := hcl.DecodeObject(&st, item.Val); err != nil {
+		return nil, fmt.Errorf("error decoding http target connection")
+	}
+
+	var listVal *ast.ObjectList
+	if ot, ok := item.Val.(*ast.ObjectType); ok {
+		listVal = ot.List
+	} else {
+		return nil, fmt.Errorf("http proxy connection not an object")
+	}
+
+	if envsList := listVal.Filter("environment_variables"); len(envsList.Items) > 0 {
+		envs, err := loadTargetEndpointScriptTargetEnvironmentVariablesHCL(envsList.Items[0])
+		if err != nil {
+			return nil, err
+		}
+
+		st.EnvironmentVariables = envs
+	}
+
+	return &st, nil
+}
+
+func loadTargetEndpointScriptTargetEnvironmentVariablesHCL(item *ast.ObjectItem) ([]*EnvironmentVariable, error) {
+	var envsVal *ast.ObjectList
+	if ot, ok := item.Val.(*ast.ObjectType); ok {
+		envsVal = ot.List
+	} else {
+		return nil, fmt.Errorf("error decoding enverties")
+	}
+
+	var newEnvs []*EnvironmentVariable
+	for _, p := range envsVal.Items {
+		var val interface{}
+		if err := hcl.DecodeObject(&val, p.Val); err != nil {
+			fmt.Println("can't decode enverty object")
+		}
+
+		newEnv := EnvironmentVariable{Name: p.Keys[0].Token.Value().(string), Value: val}
+		newEnvs = append(newEnvs, &newEnv)
+	}
+
+	return newEnvs, nil
 }
 
 func loadTargetEndpointHTTPTargetConnectionHCL(item *ast.ObjectItem) (*HTTPTargetConnection, error) {

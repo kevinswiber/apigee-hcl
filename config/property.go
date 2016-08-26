@@ -10,7 +10,7 @@ import (
 type Property struct {
 	XMLName string      `xml:"Property"`
 	Name    string      `xml:"name,attr" hcl:",key"`
-	Value   interface{} `xml:",chardata"`
+	Value   interface{} `xml:",chardata" hcl:"-"`
 }
 
 func loadPropertiesHCL(item *ast.ObjectItem) ([]*Property, error) {

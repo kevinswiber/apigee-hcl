@@ -11,10 +11,10 @@ type ProxyEndpoint struct {
 	XMLName             string               `xml:"ProxyEndpoint" hcl:"-"`
 	Name                string               `xml:"name,attr" hcl:"-"`
 	PreFlow             *PreFlow             `hcl:"pre_flow"`
-	Flows               []*Flow              `xml:"Flows,omitempty>Flow" hcl:"flows"`
+	Flows               []*Flow              `xml:"Flows>Flow" hcl:"flows"`
 	PostFlow            *PostFlow            `hcl:"post_flow"`
 	PostClientFlow      *PostClientFlow      `hcl:"post_client_flow"`
-	FaultRules          []*FaultRule         `xml:"FaultRules,omitempty>FaultRule" hcl:"fault_rules"`
+	FaultRules          []*FaultRule         `xml:"FaultRules>FaultRule" hcl:"fault_rules"`
 	DefaultFaultRule    *DefaultFaultRule    `hcl:"default_fault_rule"`
 	HTTPProxyConnection *HTTPProxyConnection `hcl:"http_proxy_connection"`
 	RouteRules          []*RouteRule         `xml:"RouteRule" hcl:"route_rule"`
@@ -24,7 +24,7 @@ type HTTPProxyConnection struct {
 	XMLName      string      `xml:"HTTPProxyConnection" hcl:"-"`
 	BasePath     string      `hcl:"base_path"`
 	VirtualHosts []string    `xml:"VirtualHost" hcl:"virtual_host"`
-	Properties   []*Property `xml:"Properties,omitempty>Property" hcl:"properties"`
+	Properties   []*Property `xml:"Properties>Property" hcl:"properties"`
 }
 
 type RouteRule struct {

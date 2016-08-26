@@ -81,12 +81,22 @@ target_endpoint "default" {
         is_fallback = true
       }
     }
+  }
 
-    local_target_connection {
-      path           = "/v1/streetcarts"
-      proxy_endpoint = "yolo"
-      api_proxy      = "hey"
+  local_target_connection {
+    path           = "/v1/streetcarts"
+    proxy_endpoint = "yolo"
+    api_proxy      = "hey"
+  }
+
+  script_target {
+    resource_url = "node://server.js"
+
+    environment_variables {
+      NAME = "VALUE"
     }
+
+    arguments = ["arg1", "arg2"]
   }
 }
 
