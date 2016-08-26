@@ -19,10 +19,11 @@ type TargetEndpoint struct {
 }
 
 type HTTPTargetConnection struct {
-	XMLName      string        `xml:"HTTPTargetConnection" hcl:"-"`
-	URL          string        `hcl:"url"`
-	LoadBalancer *LoadBalancer `hcl:"load_balancer"`
-	Properties   []*Property   `xml:"Properties,omitempty>Property" hcl:"properties"`
+	XMLName               string                 `xml:"HTTPTargetConnection" hcl:"-"`
+	URL                   string                 `hcl:"url"`
+	LoadBalancer          *LoadBalancer          `hcl:"load_balancer"`
+	LocalTargetConnection *LocalTargetConnection `xml:",omitempty" hcl:"local_target_connection"`
+	Properties            []*Property            `xml:"Properties,omitempty>Property" hcl:"properties"`
 }
 
 type LoadBalancer struct {
@@ -31,6 +32,13 @@ type LoadBalancer struct {
 	Servers      []*LoadBalancerServer `xml:"Server" hcl:"server"`
 	MaxFailures  int                   `xml:",omitempty" hcl:"max_failures"`
 	RetryEnabled bool                  `xml:",omitempty" hcl:"retry_enabled"`
+}
+
+type LocalTargetConnection struct {
+	XMLName       string `xml:"LocalTargetConnection" hcl:"-"`
+	APIProxy      string `xml:",omitempty" hcl:"api_proxy"`
+	ProxyEndpoint string `xml:",omitempty" hcl:"proxy_endpoint"`
+	Path          string `xml:",omitempty" hcl:"path"`
 }
 
 type LoadBalancerServer struct {

@@ -81,6 +81,12 @@ target_endpoint "default" {
         is_fallback = true
       }
     }
+
+    local_target_connection {
+      path           = "/v1/streetcarts"
+      proxy_endpoint = "yolo"
+      api_proxy      = "hey"
+    }
   }
 }
 
