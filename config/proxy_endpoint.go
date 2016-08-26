@@ -60,6 +60,15 @@ func loadProxyEndpointsHCL(list *ast.ObjectList) ([]*ProxyEndpoint, error) {
 			proxyEndpoint.PreFlow = preFlow
 		}
 
+		if flows := listVal.Filter("flow"); len(flows.Items) > 0 {
+			flows, err := loadFlowsHCL(flows)
+			if err != nil {
+				return nil, err
+			}
+
+			proxyEndpoint.Flows = flows
+		}
+
 		if postFlow := listVal.Filter("post_flow"); len(postFlow.Items) > 0 {
 			postFlow, err := loadPostFlowHCL(postFlow)
 			if err != nil {
