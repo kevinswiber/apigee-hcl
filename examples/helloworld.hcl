@@ -68,6 +68,19 @@ proxy_endpoint "default" {
 target_endpoint "default" {
   http_target_connection {
     url = "http://mocktarget.apigee.net"
+
+    load_balancer {
+      algorithm = "weighted"
+
+      server "server1" {
+        weight = 1
+      }
+
+      server "server2" {
+        weight      = 2
+        is_fallback = true
+      }
+    }
   }
 }
 

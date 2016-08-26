@@ -29,15 +29,15 @@ type LoadBalancer struct {
 	XMLName      string                `xml:"LoadBalancer" hcl:"-"`
 	Algorithm    string                `hcl:"algorithm"`
 	Servers      []*LoadBalancerServer `xml:"Server" hcl:"server"`
-	MaxFailures  int                   `hcl:"max_failures"`
-	RetryEnabled bool                  `hcl:"retry_enabled"`
+	MaxFailures  int                   `xml:",omitempty" hcl:"max_failures"`
+	RetryEnabled bool                  `xml:",omitempty" hcl:"retry_enabled"`
 }
 
 type LoadBalancerServer struct {
 	XMLName    string `xml:"Server" hcl:"-"`
 	Name       string `xml:"name,attr" hcl:"-"`
-	Weight     int    `hcl:"weight"`
-	IsFallback bool   `hcl:"is_fallback"`
+	Weight     int    `xml:",omitempty" hcl:"weight"`
+	IsFallback bool   `xml:",omitempty" hcl:"is_fallback"`
 }
 
 func loadTargetEndpointsHCL(list *ast.ObjectList) ([]*TargetEndpoint, error) {
@@ -144,7 +144,35 @@ func loadTargetEndpointHTTPTargetConnectionHCL(item *ast.ObjectItem) (*HTTPTarge
 	}
 
 	if lbList := listVal.Filter("load_balancer"); len(lbList.Items) > 0 {
-		//lb := lbList.Items[0]
+		var lb LoadBalancer
+		if err := hcl.DecodeObject(&lb, lbList.Items[0]); err != nil {
+			return nil, err
+		}
+
+		var lbListVal *ast.ObjectList
+		if ot, ok := lbList.Items[0].Val.(*ast.ObjectType); ok {
+			lbListVal = ot.List
+		} else {
+			return nil, fmt.Errorf("load balancer not an object")
+		}
+
+		var lbServers []*LoadBalancerServer
+		if serversList := lbListVal.Filter("server"); len(serversList.Items) > 0 {
+			fmt.Println("got servers")
+			for _, item := range serversList.Items {
+				var s LoadBalancerServer
+				if err := hcl.DecodeObject(&s, item); err != nil {
+					return nil, err
+				}
+				s.Name = item.Keys[0].Token.Value().(string)
+				fmt.Printf("name = %s\n", s.Name)
+				lbServers = append(lbServers, &s)
+			}
+
+			lb.Servers = lbServers
+		}
+
+		htc.LoadBalancer = &lb
 	}
 
 	return &htc, nil
