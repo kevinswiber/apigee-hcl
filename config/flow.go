@@ -8,27 +8,27 @@ import (
 )
 
 type PreFlow struct {
-	XMLName  string       `xml:"PreFlow" hcl:",-"`
+	XMLName  string       `xml:"PreFlow" hcl:"-"`
 	Request  FlowRequest  `hcl:"request"`
 	Response FlowResponse `hcl:"response"`
 }
 
 type Flow struct {
-	XMLName   string       `xml:"Flow" hcl:",-"`
-	Name      string       `xml:"name,attr" hcl:",-"`
+	XMLName   string       `xml:"Flow" hcl:"-"`
+	Name      string       `xml:"name,attr" hcl:"-"`
 	Condition string       `xml:",omitempty" hcl:"condition"`
 	Request   FlowRequest  `hcl:"request"`
 	Response  FlowResponse `hcl:"response"`
 }
 
 type PostFlow struct {
-	XMLName  string       `xml:"PostFlow" hcl:",-"`
+	XMLName  string       `xml:"PostFlow" hcl:"-"`
 	Request  FlowRequest  `hcl:"request"`
 	Response FlowResponse `hcl:"response"`
 }
 
 type PostClientFlow struct {
-	XMLName  string       `xml:"PostClientFlow" hcl:",-"`
+	XMLName  string       `xml:"PostClientFlow" hcl:"-"`
 	Request  FlowRequest  `hcl:"request"`
 	Response FlowResponse `hcl:"response"`
 }
@@ -40,12 +40,12 @@ type FlowStep struct {
 }
 
 type FlowRequest struct {
-	XMLName string      `xml:"Request" hcl:",-"`
+	XMLName string      `xml:"Request" hcl:"-"`
 	Steps   []*FlowStep `xml:",innerxml" hcl:"step"`
 }
 
 type FlowResponse struct {
-	XMLName string      `xml:"Response" hcl:",-"`
+	XMLName string      `xml:"Response" hcl:"-"`
 	Steps   []*FlowStep `xml:",innerxml" hcl:"step"`
 }
 

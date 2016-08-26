@@ -26,6 +26,11 @@ proxy_endpoint "default" {
   http_proxy_connection {
     base_path    = "/v0/hello"
     virtual_host = ["default", "secure"]
+
+    properties {
+      "allow.http10"              = true
+      "request.streaming.enabled" = true
+    }
   }
 
   route_rule "preflight" {

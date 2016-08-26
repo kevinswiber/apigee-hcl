@@ -8,8 +8,8 @@ import (
 )
 
 type Proxy struct {
-	XMLName     string `xml:"APIProxy", hcl:",-"`
-	Name        string `xml:"name,attr,omitempty" hcl:",-"`
+	XMLName     string `xml:"APIProxy", hcl:"-"`
+	Name        string `xml:"name,attr,omitempty" hcl:"-"`
 	DisplayName string `xml:",omitempty" hcl:"display_name"`
 	Description string `xml:",omitempty" hcl:"description"`
 }
