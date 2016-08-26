@@ -70,42 +70,52 @@ func loadProxyEndpointsHcl(list *ast.ObjectList) ([]*ProxyEndpoint, error) {
 		proxyEndpoint.Name = n
 
 		if preFlow := listVal.Filter("pre_flow"); len(preFlow.Items) > 0 {
-			proxyEndpoint.PreFlow = &PreFlow{}
-			preFlowItem := preFlow.Items[0]
-
-			var preFlowItemVal *ast.ObjectList
-			if preFlowOT, ok := preFlowItem.Val.(*ast.ObjectType); ok {
-				preFlowItemVal = preFlowOT.List
-			} else {
-				return nil, fmt.Errorf("pre flow item not an object")
+			preFlow, err := loadProxyEndpointPreFlowHcl(preFlow)
+			if err != nil {
+				return nil, err
 			}
 
-			if request := preFlowItemVal.Filter("request"); len(request.Items) > 0 {
-				item := request.Items[0]
-
-				steps, err := loadFlowSteps(item)
-				if err != nil {
-					return nil, err
-				}
-
-				proxyEndpoint.PreFlow.Request.Steps = steps
-			}
-
-			if response := preFlowItemVal.Filter("response"); len(response.Items) > 0 {
-				item := response.Items[0]
-
-				steps, err := loadFlowSteps(item)
-				if err != nil {
-					return nil, err
-				}
-
-				proxyEndpoint.PreFlow.Response.Steps = steps
-			}
-
+			proxyEndpoint.PreFlow = preFlow
 		}
 
 		result = append(result, &proxyEndpoint)
 	}
 
 	return result, nil
+}
+
+func loadProxyEndpointPreFlowHcl(list *ast.ObjectList) (*PreFlow, error) {
+	var result PreFlow
+	preFlowItem := list.Items[0]
+
+	var listVal *ast.ObjectList
+	if ot, ok := preFlowItem.Val.(*ast.ObjectType); ok {
+		listVal = ot.List
+	} else {
+		return nil, fmt.Errorf("pre flow item not an object")
+	}
+
+	if request := listVal.Filter("request"); len(request.Items) > 0 {
+		item := request.Items[0]
+
+		steps, err := loadFlowSteps(item)
+		if err != nil {
+			return nil, err
+		}
+
+		result.Request.Steps = steps
+	}
+
+	if response := listVal.Filter("response"); len(response.Items) > 0 {
+		item := response.Items[0]
+
+		steps, err := loadFlowSteps(item)
+		if err != nil {
+			return nil, err
+		}
+
+		result.Response.Steps = steps
+	}
+
+	return &result, nil
 }
