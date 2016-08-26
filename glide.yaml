@@ -1,0 +1,3 @@
+package: github.com/kevinswiber/apigee-hcl
+import:
+- package: github.com/hashicorp/hcl
