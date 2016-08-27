@@ -1,8 +1,6 @@
 package policy
 
 import (
-	"fmt"
-
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
 )
@@ -18,13 +16,14 @@ type AssignMessageAssignTo struct {
 	Type      string `xml:"type,attr" hcl:"type"`
 }
 
-func LoadAssignMessageHCL(item *ast.ObjectItem) (*AssignMessagePolicy, error) {
+func LoadAssignMessageHCL(item *ast.ObjectItem) (interface{}, error) {
 	var p AssignMessagePolicy
 
 	if err := hcl.DecodeObject(&p, item.Val.(*ast.ObjectType)); err != nil {
 		return nil, err
 	}
 
-	fmt.Printf("assign message: %+v\n", p)
+	p.Name = item.Keys[1].Token.Value().(string)
+
 	return &p, nil
 }

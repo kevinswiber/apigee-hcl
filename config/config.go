@@ -1,10 +1,7 @@
 package config
 
 import (
-	//	"fmt"
-	//	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
-	"github.com/kevinswiber/apg-hcl/config/policy"
 )
 
 type Config struct {
@@ -15,7 +12,7 @@ type Config struct {
 }
 
 func LoadConfigFromHCL(list *ast.ObjectList) (*Config, error) {
-	var config Config
+	var c Config
 
 	if proxies := list.Filter("proxy"); len(proxies.Items) > 0 {
 		result, err := loadProxyHCL(proxies)
@@ -24,7 +21,7 @@ func LoadConfigFromHCL(list *ast.ObjectList) (*Config, error) {
 			return nil, err
 		}
 
-		config.Proxy = result
+		c.Proxy = result
 	}
 
 	if proxyEndpoints := list.Filter("proxy_endpoint"); len(proxyEndpoints.Items) > 0 {
@@ -33,7 +30,7 @@ func LoadConfigFromHCL(list *ast.ObjectList) (*Config, error) {
 			return nil, err
 		}
 
-		config.ProxyEndpoints = result
+		c.ProxyEndpoints = result
 	}
 
 	if targetEndpoints := list.Filter("target_endpoint"); len(targetEndpoints.Items) > 0 {
@@ -42,22 +39,22 @@ func LoadConfigFromHCL(list *ast.ObjectList) (*Config, error) {
 			return nil, err
 		}
 
-		config.TargetEndpoints = result
+		c.TargetEndpoints = result
 	}
 
 	if policies := list.Filter("policy"); len(policies.Items) > 0 {
 		for _, item := range policies.Items {
 			policyType := item.Keys[0].Token.Value().(string)
 
-			if policyType == "assign_message" {
-				_, err := policy.LoadAssignMessageHCL(item)
-
+			if f, ok := PolicyList[policyType]; ok {
+				p, err := f(item)
 				if err != nil {
 					return nil, err
 				}
 
+				c.Policies = append(c.Policies, p)
 			}
 		}
 	}
-	return &config, nil
+	return &c, nil
 }

@@ -1,8 +1,8 @@
 package main
 
 import (
-	//"encoding/xml"
-	//"fmt"
+	"encoding/xml"
+	"fmt"
 	"io/ioutil"
 	"log"
 
@@ -31,18 +31,18 @@ func main() {
 	}
 
 	//config, err := config.LoadConfigFromHCL(list)
-	_, err = config.LoadConfigFromHCL(list)
+	c, err := config.LoadConfigFromHCL(list)
 	if err != nil {
 		log.Fatalf("err: %s", err)
 	}
 
-	/*
-		var output []byte
-		if output, err = xml.MarshalIndent(config.Proxy, "", "    "); err != nil {
-			log.Fatalf("err: %s", err)
-		}
-		fmt.Printf("%s\n", string(output))
+	var output []byte
+	if output, err = xml.MarshalIndent(c.Proxy, "", "    "); err != nil {
+		log.Fatalf("err: %s", err)
+	}
+	fmt.Printf("%s\n", string(output))
 
+	/*
 		for _, proxyEndpoint := range config.ProxyEndpoints {
 			var output []byte
 			output, err := xml.MarshalIndent(proxyEndpoint, "", "    ")
@@ -61,4 +61,12 @@ func main() {
 			//fmt.Printf("%s\n", string(output))
 		}
 	*/
+	for _, policy := range c.Policies {
+		var output []byte
+		output, err := xml.MarshalIndent(policy, "", "    ")
+		if err != nil {
+			log.Fatalf("err: %s", err)
+		}
+		fmt.Printf("%s\n", string(output))
+	}
 }
