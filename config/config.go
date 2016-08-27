@@ -1,13 +1,17 @@
 package config
 
 import (
+	//	"fmt"
+	//	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
+	"github.com/kevinswiber/apg-hcl/config/policy"
 )
 
 type Config struct {
 	Proxy           *Proxy
 	ProxyEndpoints  []*ProxyEndpoint
 	TargetEndpoints []*TargetEndpoint
+	Policies        []interface{}
 }
 
 func LoadConfigFromHCL(list *ast.ObjectList) (*Config, error) {
@@ -41,5 +45,19 @@ func LoadConfigFromHCL(list *ast.ObjectList) (*Config, error) {
 		config.TargetEndpoints = result
 	}
 
+	if policies := list.Filter("policy"); len(policies.Items) > 0 {
+		for _, item := range policies.Items {
+			policyType := item.Keys[0].Token.Value().(string)
+
+			if policyType == "assign_message" {
+				_, err := policy.LoadAssignMessageHCL(item)
+
+				if err != nil {
+					return nil, err
+				}
+
+			}
+		}
+	}
 	return &config, nil
 }
