@@ -30,7 +30,6 @@ func main() {
 		log.Fatalf("error parsing: file doesn't contain root object")
 	}
 
-	//config, err := config.LoadConfigFromHCL(list)
 	c, err := config.LoadConfigFromHCL(list)
 	if err != nil {
 		log.Fatalf("err: %s", err)
@@ -42,25 +41,24 @@ func main() {
 	}
 	fmt.Printf("%s\n", string(output))
 
-	/*
-		for _, proxyEndpoint := range config.ProxyEndpoints {
-			var output []byte
-			output, err := xml.MarshalIndent(proxyEndpoint, "", "    ")
-			if err != nil {
-				log.Fatalf("err: %s", err)
-			}
-			fmt.Printf("%s\n", string(output))
+	for _, proxyEndpoint := range c.ProxyEndpoints {
+		var output []byte
+		output, err := xml.MarshalIndent(proxyEndpoint, "", "    ")
+		if err != nil {
+			log.Fatalf("err: %s", err)
 		}
+		fmt.Printf("%s\n", string(output))
+	}
 
-		for _, targetEndpoint := range config.TargetEndpoints {
-			var output []byte
-			output, err := xml.MarshalIndent(targetEndpoint, "", "    ")
-			if err != nil {
-				log.Fatalf("err: %s", err)
-			}
-			//fmt.Printf("%s\n", string(output))
+	for _, targetEndpoint := range c.TargetEndpoints {
+		var output []byte
+		output, err := xml.MarshalIndent(targetEndpoint, "", "    ")
+		if err != nil {
+			log.Fatalf("err: %s", err)
 		}
-	*/
+		fmt.Printf("%s\n", string(output))
+	}
+
 	for _, policy := range c.Policies {
 		var output []byte
 		output, err := xml.MarshalIndent(policy, "", "    ")
