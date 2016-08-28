@@ -12,7 +12,8 @@ import (
 )
 
 func main() {
-	file := "./examples/helloworld.hcl"
+	//file := "./examples/helloworld.hcl"
+	file := "./examples/assign_message.hcl"
 	//file := "./examples/conditional_policy.hcl"
 
 	d, err := ioutil.ReadFile(file)
