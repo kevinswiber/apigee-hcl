@@ -61,12 +61,12 @@ type asyncConfig struct {
 
 type identifier struct {
 	XMLName string `xml:"Identifier" hcl:"-"`
-	Ref     string `xml:"ref,attr" hcl:"ref"`
+	Ref     string `xml:"ref,attr,omitempty" hcl:"ref"`
 }
 
 type messageWeight struct {
 	XMLName string `xml:"MessageWeight" hcl:"-"`
-	Ref     string `xml:"ref,attr" hcl:"ref"`
+	Ref     string `xml:"ref,attr,omitempty" hcl:"ref"`
 }
 
 func LoadQuotaHCL(item *ast.ObjectItem) (interface{}, error) {
