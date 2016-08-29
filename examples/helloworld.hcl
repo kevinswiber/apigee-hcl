@@ -35,9 +35,8 @@ target_endpoint "default" {
 }
 
 policy assign_message "add-cors" {
+  display_name                = "Add CORS"
   ignore_unresolved_variables = true
-
-  display_name = "Add CORS"
 
   add {
     header "Access-Control-Allow-Origin" {

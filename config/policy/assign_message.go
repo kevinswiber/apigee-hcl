@@ -53,7 +53,7 @@ type set struct {
 	Headers      []*header     `xml:"Headers>Header" hcl:"header"`
 	QueryParams  []*queryParam `xml:"QueryParams>QueryParam" hcl:"query_param"`
 	FormParams   []*formParam  `xml:"FormParams>FormParam" hcl:"form_param"`
-	Payload      payload       `xml:",omitempty" hcl:"payload"`
+	Payload      *payload      `xml:",omitempty" hcl:"payload"`
 	Version      string        `xml:",omitempty" hcl:"version"`
 	Verb         string        `xml:",omitempty" hcl:"verb"`
 	Path         string        `xml:",omitempty" hcl:"path"`
