@@ -1,16 +1,9 @@
-proxy "helloworld" {
-  display_name = "helloworld"
-}
+proxy "quotafixture" {}
 
 proxy_endpoint "default" {
   pre_flow {
     request {
       step "check-quota" {}
-
-      # Handle preflight OPTIONS calls for cross origin requests
-      step "add-cors" {
-        condition = "request.verb == \"OPTIONS\""
-      }
     }
   }
 
@@ -34,37 +27,6 @@ target_endpoint "default" {
   }
 }
 
-policy assign_message "add-cors" {
-  continue_on_error           = false
-  enabled                     = true
-  ignore_unresolved_variables = true
-  display_name                = "Add CORS"
-
-  add {
-    header "Access-Control-Allow-Origin" {
-      value = "{request.header.origin}"
-    }
-
-    header "Access-Control-Allow-Headers" {
-      value = "origin, x-requested-with, accept"
-    }
-
-    header "Access-Control-Max-Age" {
-      value = "3628800"
-    }
-
-    header "Access-Control-Allow-Methods" {
-      value = "GET, PUT, POST, DELETE"
-    }
-  }
-
-  assign_to {
-    create_new = false
-    transport  = "http"
-    type       = "response"
-  }
-}
-
 policy quota "check-quota" {
   async             = false
   continue_on_error = false
@@ -75,6 +37,20 @@ policy quota "check-quota" {
   allow {
     count     = 5
     count_ref = "request.header.allowed_quota"
+
+    class {
+      ref = "request.queryparam.time_variable"
+
+      allow {
+        class = "peak_time"
+        count = 5000
+      }
+
+      allow {
+        class = "off_peak_time"
+        count = 1000
+      }
+    }
   }
 
   interval {
@@ -95,5 +71,13 @@ policy quota "check-quota" {
   asynchronous_configuration {
     sync_interval_in_seconds = 20
     sync_message_count       = 5
+  }
+
+  identifier {
+    ref = "verifyapikey.verify-api-key.client_id"
+  }
+
+  message_weight {
+    ref = "request.header.weight"
   }
 }
