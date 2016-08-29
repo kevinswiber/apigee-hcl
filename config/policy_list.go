@@ -8,4 +8,5 @@ import (
 var PolicyList = map[string]func(*ast.ObjectItem) (interface{}, error){
 	"assign_message": policy.LoadAssignMessageHCL,
 	"quota":          policy.LoadQuotaHCL,
+	"script":         policy.LoadScriptHCL,
 }
