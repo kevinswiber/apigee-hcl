@@ -95,8 +95,8 @@ type formParam struct {
 
 type assignTo struct {
 	CreateNew bool   `xml:"createNew,attr" hcl:"create_new"`
-	Transport string `xml:"transport,attr" hcl:"transport"`
-	Type      string `xml:"type,attr" hcl:"type"`
+	Transport string `xml:"transport,attr,omitempty" hcl:"transport"`
+	Type      string `xml:"type,attr,omitempty" hcl:"type"`
 	Value     string `xml:",chardata" hcl:"value"`
 }
 

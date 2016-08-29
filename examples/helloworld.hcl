@@ -35,10 +35,9 @@ target_endpoint "default" {
 }
 
 policy assign_message "add-cors" {
-  continue_on_error           = false
-  enabled                     = true
   ignore_unresolved_variables = true
-  display_name                = "Add CORS"
+
+  display_name = "Add CORS"
 
   add {
     header "Access-Control-Allow-Origin" {
@@ -60,17 +59,13 @@ policy assign_message "add-cors" {
 
   assign_to {
     create_new = false
-    transport  = "http"
     type       = "response"
   }
 }
 
 policy quota "check-quota" {
-  async             = false
-  continue_on_error = false
-  enabled           = true
-  type              = "calendar"
-  display_name      = "Check Quota"
+  type         = "calendar"
+  display_name = "Check Quota"
 
   allow {
     count     = 5
