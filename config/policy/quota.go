@@ -9,17 +9,17 @@ import (
 type QuotaPolicy struct {
 	XMLName                   string `xml:"Quota" hcl:"-"`
 	Policy                    `hcl:",squash"`
-	Type                      string        `xml:"type,attr,omitempty" hcl:"type"`
-	DisplayName               string        `xml:",omitempty" hcl:"display_name"`
-	Allows                    []*allow      `xml:"Allow" hcl:"allow"`
-	Interval                  interval      `hcl:"interval"`
-	TimeUnit                  timeUnit      `hcl:"time_unit"`
-	StartTime                 string        `xml:",omitempty" hcl:"start_time"`
-	Distributed               bool          `xml:",omitempty" hcl:"distributed"`
-	Synchronous               bool          `xml:",omitempty" hcl:"synchronous"`
-	AsynchronousConfiguration asyncConfig   `xml:",omitempty" hcl:"asynchronous_configuration"`
-	Identifier                identifier    `xml:",omitempty" hcl:"identifier"`
-	MessageWeight             messageWeight `xml:",omitempty" hcl:"message_weight"`
+	Type                      string         `xml:"type,attr,omitempty" hcl:"type"`
+	DisplayName               string         `xml:",omitempty" hcl:"display_name"`
+	Allows                    []*allow       `xml:"Allow" hcl:"allow"`
+	Interval                  *interval      `hcl:"interval"`
+	TimeUnit                  *timeUnit      `hcl:"time_unit"`
+	StartTime                 string         `xml:",omitempty" hcl:"start_time"`
+	Distributed               bool           `xml:",omitempty" hcl:"distributed"`
+	Synchronous               bool           `xml:",omitempty" hcl:"synchronous"`
+	AsynchronousConfiguration *asyncConfig   `xml:",omitempty" hcl:"asynchronous_configuration"`
+	Identifier                *identifier    `xml:",omitempty" hcl:"identifier"`
+	MessageWeight             *messageWeight `xml:",omitempty" hcl:"message_weight"`
 }
 
 type allow struct {
