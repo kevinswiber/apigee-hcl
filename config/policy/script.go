@@ -16,11 +16,13 @@ type ScriptPolicy struct {
 func LoadScriptHCL(item *ast.ObjectItem) (interface{}, error) {
 	var p ScriptPolicy
 
-	if err := hcl.DecodeObject(&p, item.Val.(*ast.ObjectType)); err != nil {
+	if err := LoadCommonPolicyHCL(item, &p.Policy); err != nil {
 		return nil, err
 	}
 
-	p.Name = item.Keys[1].Token.Value().(string)
+	if err := hcl.DecodeObject(&p, item.Val.(*ast.ObjectType)); err != nil {
+		return nil, err
+	}
 
 	return &p, nil
 }

@@ -103,11 +103,13 @@ type assignTo struct {
 func LoadAssignMessageHCL(item *ast.ObjectItem) (interface{}, error) {
 	var p AssignMessagePolicy
 
-	if err := hcl.DecodeObject(&p, item.Val.(*ast.ObjectType)); err != nil {
+	if err := LoadCommonPolicyHCL(item, &p.Policy); err != nil {
 		return nil, err
 	}
 
-	p.Name = item.Keys[1].Token.Value().(string)
+	if err := hcl.DecodeObject(&p, item.Val.(*ast.ObjectType)); err != nil {
+		return nil, err
+	}
 
 	var listVal *ast.ObjectList
 	if ot, ok := item.Val.(*ast.ObjectType); ok {
