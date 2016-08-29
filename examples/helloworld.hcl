@@ -63,8 +63,8 @@ policy assign_message "add-cors" {
 }
 
 policy quota "check-quota" {
-  type         = "calendar"
   display_name = "Check Quota"
+  type         = "calendar"
 
   allow {
     count     = 5
