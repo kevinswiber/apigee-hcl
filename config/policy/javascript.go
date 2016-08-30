@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
-	"github.com/kevinswiber/apg-hcl/config/common"
+	"github.com/kevinswiber/apigee-hcl/config/common"
 )
 
 type JavaScriptPolicy struct {

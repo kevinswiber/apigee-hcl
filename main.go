@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"github.com/kevinswiber/apg-hcl/cli"
+	"github.com/kevinswiber/apigee-hcl/cli"
 	"path"
 )
 

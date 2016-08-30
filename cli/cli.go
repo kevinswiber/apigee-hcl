@@ -5,7 +5,7 @@ import (
 	"github.com/crufter/copyrecur"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
-	"github.com/kevinswiber/apg-hcl/config"
+	"github.com/kevinswiber/apigee-hcl/config"
 	"io/ioutil"
 	"log"
 	"os"

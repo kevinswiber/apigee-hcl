@@ -2,7 +2,7 @@ package config
 
 import (
 	"github.com/hashicorp/hcl/hcl/ast"
-	"github.com/kevinswiber/apg-hcl/config/policy"
+	"github.com/kevinswiber/apigee-hcl/config/policy"
 )
 
 type Config struct {
