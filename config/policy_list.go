@@ -11,4 +11,5 @@ var PolicyList = map[string]func(*ast.ObjectItem) (interface{}, error){
 	"script":         policy.LoadScriptHCL,
 	"javascript":     policy.LoadJavaScriptHCL,
 	"verify_api_key": policy.LoadVerifyAPIKeyHCL,
+	"spike_arrest":   policy.LoadSpikeArrestHCL,
 }
