@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/hashicorp/hcl/hcl/ast"
+	"github.com/kevinswiber/apg-hcl/config/policy"
 )
 
 type Config struct {
@@ -9,6 +10,7 @@ type Config struct {
 	ProxyEndpoints  []*ProxyEndpoint
 	TargetEndpoints []*TargetEndpoint
 	Policies        []interface{}
+	Resources       map[string]string
 }
 
 func LoadConfigFromHCL(list *ast.ObjectList) (*Config, error) {
@@ -54,6 +56,16 @@ func LoadConfigFromHCL(list *ast.ObjectList) (*Config, error) {
 					return nil, err
 				}
 
+				switch p.(type) {
+				case policy.ScriptPolicy:
+					script := p.(policy.ScriptPolicy)
+					if len(script.ResourceURL) > 0 && len(script.Content) > 0 {
+						if c.Resources == nil {
+							c.Resources = make(map[string]string)
+						}
+						c.Resources[script.ResourceURL] = script.Content
+					}
+				}
 				ps = append(ps, p)
 			}
 		}

@@ -1,7 +1,6 @@
 package policy
 
 import (
-	"fmt"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
 )
@@ -24,11 +23,6 @@ func LoadScriptHCL(item *ast.ObjectItem) (interface{}, error) {
 
 	if err := hcl.DecodeObject(&p, item.Val.(*ast.ObjectType)); err != nil {
 		return nil, err
-	}
-
-	if len(p.Content) > 0 {
-		fmt.Println(p.ResourceURL)
-		fmt.Println(p.Content)
 	}
 
 	return p, nil

@@ -11,6 +11,7 @@ import (
 	"os"
 	"path"
 	"reflect"
+	"strings"
 )
 
 type CLIOptions struct {
@@ -135,6 +136,26 @@ func StartCLI(opts *CLIOptions) {
 			}
 			if err := copyrecur.CopyDir(opts.ResourcesPath, resourcesPath); err != nil {
 				log.Fatalf("err :%s", err)
+			}
+		}
+	}
+
+	if c.Resources != nil {
+		if err := ensureDirectory(resourcesPath); err != nil {
+			log.Fatalf("err: %s", err)
+		}
+
+		for fileName, content := range c.Resources {
+			parts := strings.Split(fileName, "://")
+			lang := parts[0]
+			dir := path.Join(resourcesPath, lang)
+			if err := ensureDirectory(dir); err != nil {
+				log.Fatalf("err: %s", err)
+			}
+
+			fileContents := []byte(content)
+			if err := ioutil.WriteFile(path.Join(dir, parts[1]), fileContents, 0666); err != nil {
+				log.Fatalf("err: %s", err)
 			}
 		}
 	}
