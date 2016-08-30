@@ -2,9 +2,9 @@ package config
 
 import (
 	"fmt"
-
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
+	"github.com/kevinswiber/apg-hcl/config/common"
 )
 
 type TargetEndpoint struct {
@@ -22,10 +22,10 @@ type TargetEndpoint struct {
 }
 
 type HTTPTargetConnection struct {
-	XMLName      string        `xml:"HTTPTargetConnection" hcl:"-"`
-	URL          string        `hcl:"url"`
-	LoadBalancer *LoadBalancer `hcl:"load_balancer"`
-	Properties   []*Property   `xml:"Properties>Property" hcl:"properties"`
+	XMLName      string             `xml:"HTTPTargetConnection" hcl:"-"`
+	URL          string             `hcl:"url"`
+	LoadBalancer *LoadBalancer      `hcl:"load_balancer"`
+	Properties   []*common.Property `xml:"Properties>Property" hcl:"properties"`
 }
 
 type LoadBalancer struct {
@@ -226,7 +226,7 @@ func loadTargetEndpointHTTPTargetConnectionHCL(item *ast.ObjectItem) (*HTTPTarge
 	}
 
 	if propsList := listVal.Filter("properties"); len(propsList.Items) > 0 {
-		props, err := loadPropertiesHCL(propsList.Items[0])
+		props, err := common.LoadPropertiesHCL(propsList.Items[0])
 		if err != nil {
 			return nil, err
 		}

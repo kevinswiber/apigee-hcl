@@ -63,8 +63,8 @@ type set struct {
 
 type assignVariable struct {
 	Name  string `hcl:"name"`
-	Ref   string `hcl:"ref"`
-	Value string `hcl:"value"`
+	Ref   string `xml:",omitempty" hcl:"ref"`
+	Value string `xml:",omitempty" hcl:"value"`
 }
 
 type payload struct {

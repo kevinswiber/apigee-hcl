@@ -65,6 +65,14 @@ func LoadConfigFromHCL(list *ast.ObjectList) (*Config, error) {
 						}
 						c.Resources[script.ResourceURL] = script.Content
 					}
+				case policy.JavaScriptPolicy:
+					script := p.(policy.JavaScriptPolicy)
+					if len(script.ResourceURL) > 0 && len(script.Content) > 0 {
+						if c.Resources == nil {
+							c.Resources = make(map[string]string)
+						}
+						c.Resources[script.ResourceURL] = script.Content
+					}
 				}
 				ps = append(ps, p)
 			}

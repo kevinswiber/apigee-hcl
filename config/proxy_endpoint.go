@@ -2,9 +2,9 @@ package config
 
 import (
 	"fmt"
-
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
+	"github.com/kevinswiber/apg-hcl/config/common"
 )
 
 type ProxyEndpoint struct {
@@ -21,10 +21,10 @@ type ProxyEndpoint struct {
 }
 
 type HTTPProxyConnection struct {
-	XMLName      string      `xml:"HTTPProxyConnection" hcl:"-"`
-	BasePath     string      `hcl:"base_path"`
-	VirtualHosts []string    `xml:"VirtualHost" hcl:"virtual_host"`
-	Properties   []*Property `xml:"Properties>Property" hcl:"properties"`
+	XMLName      string             `xml:"HTTPProxyConnection" hcl:"-"`
+	BasePath     string             `hcl:"base_path"`
+	VirtualHosts []string           `xml:"VirtualHost" hcl:"virtual_host"`
+	Properties   []*common.Property `xml:"Properties>Property" hcl:"properties"`
 }
 
 type RouteRule struct {
@@ -149,7 +149,7 @@ func loadProxyEndpointHTTPProxyConnectionHCL(item *ast.ObjectItem) (*HTTPProxyCo
 
 	if propsList := listVal.Filter("properties"); len(propsList.Items) > 0 {
 
-		props, err := loadPropertiesHCL(propsList.Items[0])
+		props, err := common.LoadPropertiesHCL(propsList.Items[0])
 		if err != nil {
 			return nil, err
 		}

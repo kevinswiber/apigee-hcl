@@ -1,4 +1,4 @@
-package config
+package common
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ type Property struct {
 	Value   interface{} `xml:",chardata" hcl:"-"`
 }
 
-func loadPropertiesHCL(item *ast.ObjectItem) ([]*Property, error) {
+func LoadPropertiesHCL(item *ast.ObjectItem) ([]*Property, error) {
 	var propsVal *ast.ObjectList
 	if ot, ok := item.Val.(*ast.ObjectType); ok {
 		propsVal = ot.List

@@ -86,7 +86,7 @@ func StartCLI(opts *CLIOptions) {
 		}
 	}
 
-	if len(c.ProxyEndpoints) > 0 {
+	if len(c.TargetEndpoints) > 0 {
 		if err := ensureDirectory(targetEndpointsPath); err != nil {
 			log.Fatalf("err: %s", err)
 		}
