@@ -43,6 +43,8 @@ func LoadConfigFromHCL(list *ast.ObjectList) (*Config, error) {
 	}
 
 	if policies := list.Filter("policy"); len(policies.Items) > 0 {
+		var ps []interface{}
+
 		for _, item := range policies.Items {
 			policyType := item.Keys[0].Token.Value().(string)
 
@@ -52,9 +54,11 @@ func LoadConfigFromHCL(list *ast.ObjectList) (*Config, error) {
 					return nil, err
 				}
 
-				c.Policies = append(c.Policies, p)
+				ps = append(ps, p)
 			}
 		}
+
+		c.Policies = ps
 	}
 	return &c, nil
 }

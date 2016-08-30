@@ -96,7 +96,7 @@ func LoadQuotaHCL(item *ast.ObjectItem) (interface{}, error) {
 		p.Allows = a
 	}
 
-	return &p, nil
+	return p, nil
 }
 
 func loadQuotaAllowsHCL(items []*ast.ObjectItem) ([]*allow, error) {

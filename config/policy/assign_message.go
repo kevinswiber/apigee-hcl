@@ -166,7 +166,7 @@ func LoadAssignMessageHCL(item *ast.ObjectItem) (interface{}, error) {
 		p.Set = nil
 	}
 
-	return &p, nil
+	return p, nil
 }
 
 func loadAssignMessageAddHCL(item *ast.ObjectItem) (*add, error) {

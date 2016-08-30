@@ -1,6 +1,7 @@
 package policy
 
 import (
+	"fmt"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
 )
@@ -11,6 +12,7 @@ type ScriptPolicy struct {
 	DisplayName string `xml:",omitempty" hcl:"display_name"`
 	ResourceURL string `hcl:"resource_url"`
 	IncludeURL  string `xml:",omitempty" hcl:"include_url"`
+	Content     string `xml:"-" hcl:"content"`
 }
 
 func LoadScriptHCL(item *ast.ObjectItem) (interface{}, error) {
@@ -24,5 +26,10 @@ func LoadScriptHCL(item *ast.ObjectItem) (interface{}, error) {
 		return nil, err
 	}
 
-	return &p, nil
+	if len(p.Content) > 0 {
+		fmt.Println(p.ResourceURL)
+		fmt.Println(p.Content)
+	}
+
+	return p, nil
 }
