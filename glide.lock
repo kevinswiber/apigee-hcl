@@ -1,6 +1,17 @@
-hash: 0d98102ddac9a32d998e9ccb54cd5a13ce95794f64d1a1613fc8cd21ff6868b7
-updated: 2016-08-25T13:56:29.59306141-07:00
+hash: e7b3c25784f2419a797adf8ba2ec73afc45a2f94caefa08c20224ade6da050eb
+updated: 2016-08-29T18:16:13.877316724-07:00
 imports:
+- name: github.com/crufter/copyrecur
+  version: c927f40d072603b07779128116db68f40bf410d2
 - name: github.com/hashicorp/hcl
   version: baeb59c710717b06aac1dbe2270e8192ec593244
+  subpackages:
+  - hcl/ast
+  - hcl/parser
+  - hcl/token
+  - json/parser
+  - hcl/scanner
+  - hcl/strconv
+  - json/scanner
+  - json/token
 testImports: []

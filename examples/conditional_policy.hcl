@@ -7,15 +7,15 @@ proxy_endpoint "default" {
         condition = "request.header.responsetime=\"true\""
       }
     }
+  }
 
-    http_proxy_connection {
-      base_path    = "/timer"
-      virtual_host = ["default"]
-    }
+  http_proxy_connection {
+    base_path    = "/timer"
+    virtual_host = ["default"]
+  }
 
-    route_rule "default" {
-      target_endpoint = "default"
-    }
+  route_rule "default" {
+    target_endpoint = "default"
   }
 }
 
