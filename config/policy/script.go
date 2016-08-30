@@ -8,10 +8,10 @@ import (
 type ScriptPolicy struct {
 	XMLName     string `xml:"Script" hcl:"-"`
 	Policy      `hcl:",squash"`
-	DisplayName string `xml:",omitempty" hcl:"display_name"`
-	ResourceURL string `hcl:"resource_url"`
-	IncludeURL  string `xml:",omitempty" hcl:"include_url"`
-	Content     string `xml:"-" hcl:"content"`
+	DisplayName string   `xml:",omitempty" hcl:"display_name"`
+	ResourceURL string   `hcl:"resource_url"`
+	IncludeURL  []string `xml:",omitempty" hcl:"include_url"`
+	Content     string   `xml:"-" hcl:"content"`
 }
 
 func LoadScriptHCL(item *ast.ObjectItem) (interface{}, error) {

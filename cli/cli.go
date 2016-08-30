@@ -131,9 +131,6 @@ func StartCLI(opts *CLIOptions) {
 
 	if stat, err := os.Stat(opts.ResourcesPath); err == nil {
 		if stat.IsDir() {
-			if err := ensureDirectory(resourcesPath); err != nil {
-				log.Fatalf("err: %s", err)
-			}
 			if err := copyrecur.CopyDir(opts.ResourcesPath, resourcesPath); err != nil {
 				log.Fatalf("err :%s", err)
 			}

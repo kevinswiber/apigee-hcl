@@ -13,7 +13,7 @@ type JavaScriptPolicy struct {
 	TimeLimit   int                `xml:"timeLimit,attr" hcl:"time_limit"`
 	DisplayName string             `xml:",omitempty" hcl:"display_name"`
 	ResourceURL string             `hcl:"resource_url"`
-	IncludeURL  string             `xml:",omitempty" hcl:"include_url"`
+	IncludeURL  []string           `xml:",omitempty" hcl:"include_url"`
 	Properties  []*common.Property `xml:"Properties>Property" hcl:"properties"`
 	Content     string             `xml:"-" hcl:"content"`
 }
