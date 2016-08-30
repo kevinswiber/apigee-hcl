@@ -27,7 +27,7 @@ target_endpoint "default" {
   }
 }
 
-policy verify_apikey "verify-apikey" {
+policy verify_api_key "verify-apikey" {
   async             = false
   continue_on_error = false
   enabled           = true
