@@ -8,8 +8,8 @@ import (
 type VerifyAPIKeyPolicy struct {
 	XMLName     string `xml:"VerifyAPIKey" hcl:"-"`
 	Policy      `hcl:",squash"`
-	DisplayName string   `xml:",omitempty" hcl:"display_name"`
-  APIKey      string    *apikey `hcl:"apikey"`
+	DisplayName string  `xml:",omitempty" hcl:"display_name"`
+	APIKey      *apikey `hcl:"apikey"`
 }
 
 type apikey struct {
