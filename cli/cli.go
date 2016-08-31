@@ -39,6 +39,10 @@ func StartCLI(opts *CLIOptions) {
 	policiesPath := path.Join(bundlePath, "policies")
 	resourcesPath := path.Join(bundlePath, "resources")
 
+	if err := os.RemoveAll(bundlePath); err != nil {
+		log.Fatalf("err: %s", err)
+	}
+
 	var c config.Config
 
 	for _, file := range opts.InputHCL {
