@@ -2,3 +2,4 @@ package: github.com/kevinswiber/apigee-hcl
 import:
 - package: github.com/hashicorp/hcl
 - package: github.com/crufter/copyrecur
+- package: github.com/hashicorp/go-multierror

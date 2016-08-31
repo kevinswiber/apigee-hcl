@@ -2,9 +2,11 @@ package config
 
 import (
 	"fmt"
+	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
 	"github.com/kevinswiber/apigee-hcl/config/common"
+	"github.com/kevinswiber/apigee-hcl/config/hclerror"
 )
 
 type ProxyEndpoint struct {
@@ -36,6 +38,7 @@ type RouteRule struct {
 }
 
 func loadProxyEndpointsHCL(list *ast.ObjectList) ([]*ProxyEndpoint, error) {
+	var errors *multierror.Error
 	var result []*ProxyEndpoint
 	for _, item := range list.Items {
 		n := item.Keys[0].Token.Value().(string)
