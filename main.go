@@ -9,12 +9,12 @@ import (
 func main() {
 	var options cli.CLIOptions
 
-	flag.StringVar(&options.InputHCL, "i", "", "Required. An HCL file to translate")
+	flag.Var(&options.InputHCL, "i", "Required. An HCL file to translate")
 	flag.StringVar(&options.BuildPath, "o", path.Join(".", "build"), "Optional. A build path")
 	flag.StringVar(&options.ResourcesPath, "r", path.Join(".", "resources"), "Optional. A path to resources")
 	flag.Parse()
 
-	if options.InputHCL == "" {
+	if len(options.InputHCL) == 0 {
 		flag.Usage()
 		return
 	}

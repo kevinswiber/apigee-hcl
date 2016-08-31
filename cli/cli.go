@@ -14,8 +14,19 @@ import (
 	"strings"
 )
 
+type InputValues []string
+
+func (v *InputValues) String() string {
+	return ""
+}
+
+func (v *InputValues) Set(value string) error {
+	*v = append(*v, value)
+	return nil
+}
+
 type CLIOptions struct {
-	InputHCL      string
+	InputHCL      InputValues
 	BuildPath     string
 	ResourcesPath string
 }
@@ -28,30 +39,49 @@ func StartCLI(opts *CLIOptions) {
 	policiesPath := path.Join(bundlePath, "policies")
 	resourcesPath := path.Join(bundlePath, "resources")
 
-	file := opts.InputHCL
+	var c config.Config
 
-	d, err := ioutil.ReadFile(file)
+	for _, file := range opts.InputHCL {
+		d, err := ioutil.ReadFile(file)
+		if err != nil {
+			log.Fatalf("err: %s", err)
+		}
+
+		hclRoot, err := hcl.Parse(string(d))
+		if err != nil {
+			log.Fatalf("err: %s", err)
+		}
+
+		list, ok := hclRoot.Node.(*ast.ObjectList)
+		if !ok {
+			log.Fatalf("error parsing: file doesn't contain root object")
+		}
+
+		cfg, err := config.LoadConfigFromHCL(list)
+		if err != nil {
+			log.Fatalf("err: %s", err)
+		}
+
+		if cfg.Proxy.Name != "" {
+			c.Proxy = cfg.Proxy
+		}
+
+		c.ProxyEndpoints = append(c.ProxyEndpoints, cfg.ProxyEndpoints...)
+		c.TargetEndpoints = append(c.TargetEndpoints, cfg.TargetEndpoints...)
+		c.Policies = append(c.Policies, cfg.Policies...)
+
+		if cfg.Resources != nil {
+			if c.Resources == nil {
+				c.Resources = make(map[string]string)
+			}
+			for k, v := range cfg.Resources {
+				c.Resources[k] = v
+			}
+		}
+	}
+
+	output, err := xml.MarshalIndent(c.Proxy, "", "    ")
 	if err != nil {
-		log.Fatalf("err: %s", err)
-	}
-
-	hclRoot, err := hcl.Parse(string(d))
-	if err != nil {
-		log.Fatalf("err: %s", err)
-	}
-
-	list, ok := hclRoot.Node.(*ast.ObjectList)
-	if !ok {
-		log.Fatalf("error parsing: file doesn't contain root object")
-	}
-
-	c, err := config.LoadConfigFromHCL(list)
-	if err != nil {
-		log.Fatalf("err: %s", err)
-	}
-
-	var output []byte
-	if output, err = xml.MarshalIndent(c.Proxy, "", "    "); err != nil {
 		log.Fatalf("err: %s", err)
 	}
 
