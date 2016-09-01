@@ -88,6 +88,45 @@ If you have Go v1.6+ installed, simply:
 
 `$ go install github.com/kevinswiber/apigee-hcl`
 
+
+## Policy support
+
+- [x] Assign Message
+- [x] JavaScript
+- [ ] Extract Variables
+- [x] Raise Fault
+- [ ] Service Callout
+- [ ] OAuth v2.0
+- [x] Verify API Key
+- [x] Response Cache
+- [ ] XML to JSON
+- [x] Spike Arrest
+- [x] Quota
+- [ ] XSL Transform
+- [ ] Basic Authentication
+- [ ] Statistics Collector
+- [ ] Key Value Map Operations
+- [ ] Message Logging
+- [ ] Populate Cache
+- [ ] Lookup Cache
+- [ ] JSON to XML
+- [ ] Access Control
+- [ ] Java Callout
+- [ ] JSON Threat Protection
+- [ ] Access Entity
+- [ ] SOAP Message Validation
+- [ ] Regular Expression Protection
+- [ ] Concurrent Rate Limit
+- [ ] XML Threat Protection
+- [ ] Generate SAML Assertion
+- [ ] Invalidate Cache
+- [ ] Set OAuth v2.0 Info
+- [ ] Get OAuth v2.0 Info
+- [ ] Monetization Limits Check
+- [ ] OAuth v1.0a
+- [ ] Reset Quota
+- [x] Python Script
+
 ## License
 
 Apache License, v2.0 
