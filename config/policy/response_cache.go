@@ -38,7 +38,7 @@ type expirySettings struct {
 	XMLName      string              `xml:"ExpirySettings" hcl:"-"`
 	TimeOfDay    *expiryTimeOfDay    `xml:",omitempty" hcl:"time_of_day"`
 	TimeoutInSec *expiryTimeoutInSec `xml:",omitempty" hcl:"timeout_in_sec"`
-	ExpiryDate   *expiryDate         `xml:"" hcl:"expiry_date"`
+	ExpiryDate   *expiryDate         `xml:",omitempty" hcl:"expiry_date"`
 }
 
 type expiryTimeOfDay struct {
