@@ -6,6 +6,7 @@ proxy_endpoint "default" {
   pre_flow {
     request {
       step "throw-418" {}
+      step "throw-500" {}
     }
   }
 
@@ -25,10 +26,25 @@ target_endpoint "default" {
   }
 }
 
+policy raise_fault "throw-500" {
+  continue_on_error           = false
+  enabled                     = true
+  display_name                = "Throw 500"
+  ignore_unresolved_variables = false
+  fault_response {
+    set {
+      header "brewing" {
+        value = "always"
+      }
+      status_code   = 500
+      reason_phrase = "Server Error"
+    }
+  }
+}
+
 policy raise_fault "throw-418" {
   continue_on_error           = false
   enabled                     = true
-  ignore_unresolved_variables = true
   display_name                = "Throw 418"
   fault_response {
   remove {

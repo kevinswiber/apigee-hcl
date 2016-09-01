@@ -12,7 +12,7 @@ type RaiseFaultPolicy struct {
 	Policy                    `hcl:",squash"`
 	DisplayName               string         `xml:",omitempty" hcl:"display_name"`
 	FaultResponse             *faultResponse `xml:"FaultResponse" hcl:"fault_response"`
-	IgnoreUnresolvedVariables bool           `xml:",omitempty" hcl:"ignore_unresolved_variables"`
+	IgnoreUnresolvedVariables bool           `xml:"IgnoreUnresolvedVariables" hcl:"ignore_unresolved_variables"`
 }
 
 type faultResponse struct {
@@ -60,6 +60,10 @@ func LoadRaiseFaultHCL(item *ast.ObjectItem) (interface{}, error) {
 		return nil, fmt.Errorf("raise fault policy not an object")
 	}
 
+	if ignoreUnresolved := listVal.Filter("ignore_unresolved_variables"); len(ignoreUnresolved.Items) == 0 {
+		p.IgnoreUnresolvedVariables = true
+	}
+
 	if faultResponseList := listVal.Filter("fault_response"); len(faultResponseList.Items) > 0 {
 		item := faultResponseList.Items[0]
 		a, err := loadRaiseFaultFaultResponse(item)
@@ -70,6 +74,7 @@ func LoadRaiseFaultHCL(item *ast.ObjectItem) (interface{}, error) {
 	} else {
 		p.FaultResponse = nil
 	}
+
 	return p, nil
 }
 
