@@ -13,4 +13,5 @@ var PolicyList = map[string]func(*ast.ObjectItem) (interface{}, error){
 	"verify_api_key": policy.LoadVerifyAPIKeyHCL,
 	"spike_arrest":   policy.LoadSpikeArrestHCL,
 	"response_cache": policy.LoadResponseCacheHCL,
+	"raise_fault":    policy.LoadRaiseFaultHCL,
 }
