@@ -1,7 +1,10 @@
 package config
 
 import (
+	"fmt"
+	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/hcl/hcl/ast"
+	"github.com/kevinswiber/apigee-hcl/config/hclerror"
 	"github.com/kevinswiber/apigee-hcl/config/policy"
 )
 
@@ -14,13 +17,15 @@ type Config struct {
 }
 
 func LoadConfigFromHCL(list *ast.ObjectList) (*Config, error) {
+	var errors *multierror.Error
+
 	var c Config
 
 	if proxies := list.Filter("proxy"); len(proxies.Items) > 0 {
 		result, err := loadProxyHCL(proxies)
-
 		if err != nil {
-			return nil, err
+			errors = multierror.Append(errors, err)
+			return nil, errors
 		}
 
 		c.Proxy = result
@@ -29,7 +34,8 @@ func LoadConfigFromHCL(list *ast.ObjectList) (*Config, error) {
 	if proxyEndpoints := list.Filter("proxy_endpoint"); len(proxyEndpoints.Items) > 0 {
 		result, err := loadProxyEndpointsHCL(proxyEndpoints)
 		if err != nil {
-			return nil, err
+			errors = multierror.Append(errors, err)
+			return nil, errors
 		}
 
 		c.ProxyEndpoints = result
@@ -38,7 +44,8 @@ func LoadConfigFromHCL(list *ast.ObjectList) (*Config, error) {
 	if targetEndpoints := list.Filter("target_endpoint"); len(targetEndpoints.Items) > 0 {
 		result, err := loadTargetEndpointsHCL(targetEndpoints)
 		if err != nil {
-			return nil, err
+			errors = multierror.Append(errors, err)
+			return nil, errors
 		}
 
 		c.TargetEndpoints = result
@@ -48,12 +55,24 @@ func LoadConfigFromHCL(list *ast.ObjectList) (*Config, error) {
 		var ps []interface{}
 
 		for _, item := range policies.Items {
+			if len(item.Keys) < 2 ||
+				item.Keys[0].Token.Value() == "" ||
+				item.Keys[1].Token.Value() == "" {
+				pos := item.Val.Pos()
+				newError := hclerror.PosError{
+					Pos: pos,
+					Err: fmt.Errorf("policy requires a type and name"),
+				}
+
+				errors = multierror.Append(errors, &newError)
+				continue
+			}
 			policyType := item.Keys[0].Token.Value().(string)
 
 			if f, ok := PolicyList[policyType]; ok {
 				p, err := f(item)
 				if err != nil {
-					return nil, err
+					errors = multierror.Append(errors, err)
 				}
 
 				switch p.(type) {
@@ -76,6 +95,10 @@ func LoadConfigFromHCL(list *ast.ObjectList) (*Config, error) {
 				}
 				ps = append(ps, p)
 			}
+		}
+
+		if errors != nil {
+			return nil, errors
 		}
 
 		c.Policies = ps

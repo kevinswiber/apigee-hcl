@@ -2,6 +2,7 @@ package policy
 
 import (
 	"fmt"
+	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
 )
@@ -70,30 +71,38 @@ type messageWeight struct {
 }
 
 func LoadQuotaHCL(item *ast.ObjectItem) (interface{}, error) {
+	var errors *multierror.Error
 	var p QuotaPolicy
 
 	if err := LoadCommonPolicyHCL(item, &p.Policy); err != nil {
-		return nil, err
+		errors = multierror.Append(errors, err)
+		return nil, errors
 	}
 
 	if err := hcl.DecodeObject(&p, item.Val.(*ast.ObjectType)); err != nil {
-		return nil, err
+		errors = multierror.Append(errors, err)
+		return nil, errors
 	}
 
 	var listVal *ast.ObjectList
 	if ot, ok := item.Val.(*ast.ObjectType); ok {
 		listVal = ot.List
 	} else {
-		return nil, fmt.Errorf("quota policy not an object")
+		errors = multierror.Append(errors, fmt.Errorf("quota policy not an object"))
+		return nil, errors
 	}
 
 	if allowList := listVal.Filter("allow"); len(allowList.Items) > 0 {
 		a, err := loadQuotaAllowsHCL(allowList.Items)
 		if err != nil {
-			return nil, err
+			errors = multierror.Append(errors, err)
+		} else {
+			p.Allows = a
 		}
+	}
 
-		p.Allows = a
+	if errors != nil {
+		return nil, errors
 	}
 
 	return p, nil
@@ -120,7 +129,6 @@ func loadQuotaAllowsHCL(items []*ast.ObjectItem) ([]*allow, error) {
 			if err != nil {
 				return nil, err
 			}
-
 			a.Classes = classes
 		}
 		result = append(result, &a)

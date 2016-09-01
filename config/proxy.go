@@ -2,9 +2,10 @@ package config
 
 import (
 	"fmt"
-
+	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
+	"github.com/kevinswiber/apigee-hcl/config/hclerror"
 )
 
 type Proxy struct {
@@ -15,17 +16,30 @@ type Proxy struct {
 }
 
 func loadProxyHCL(list *ast.ObjectList) (*Proxy, error) {
-	//TODO: Check if more than one proxy.  Report error.
+	var errors *multierror.Error
+
 	var item = list.Items[0]
+	if len(item.Keys) == 0 || item.Keys[0].Token.Value() == "" {
+		pos := item.Val.Pos()
+		newError := hclerror.PosError{
+			Pos: pos,
+			Err: fmt.Errorf("proxy requires a name"),
+		}
+		errors = multierror.Append(errors, &newError)
+		return nil, errors
+	}
+
 	n := item.Keys[0].Token.Value().(string)
 
 	if _, ok := item.Val.(*ast.ObjectType); !ok {
-		return nil, fmt.Errorf("proxy not an object")
+		errors = multierror.Append(errors, fmt.Errorf("proxy not an object"))
+		return nil, errors
 	}
 
 	var proxy Proxy
 	if err := hcl.DecodeObject(&proxy, item.Val); err != nil {
-		return nil, err
+		errors = multierror.Append(errors, err)
+		return nil, errors
 	}
 
 	proxy.Name = n
