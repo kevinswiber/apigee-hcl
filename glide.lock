@@ -1,8 +1,10 @@
-hash: e7b3c25784f2419a797adf8ba2ec73afc45a2f94caefa08c20224ade6da050eb
-updated: 2016-08-29T18:16:13.877316724-07:00
+hash: c0ca973e999a2549a3f10ece7c5722adbab982ffd49187ce80c71d8b81748bf4
+updated: 2016-08-31T15:00:54.041948779-07:00
 imports:
 - name: github.com/crufter/copyrecur
   version: c927f40d072603b07779128116db68f40bf410d2
+- name: github.com/hashicorp/go-multierror
+  version: 8c5f0ad9360406a3807ce7de6bc73269a91a6e51
 - name: github.com/hashicorp/hcl
   version: baeb59c710717b06aac1dbe2270e8192ec593244
   subpackages:
