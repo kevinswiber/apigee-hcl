@@ -78,19 +78,19 @@ type payload struct {
 
 type header struct {
 	XMLName string `xml:"Header" hcl:"-"`
-	Name    string `xml:"name,attr" hcl"-"`
+	Name    string `xml:"name,attr" hcl:"-"`
 	Value   string `xml:",chardata" hcl:"value"`
 }
 
 type queryParam struct {
 	XMLName string `xml:"QueryParam" hcl:"-"`
-	Name    string `xml:"name,attr" hcl"-"`
+	Name    string `xml:"name,attr" hcl:"-"`
 	Value   string `xml:",chardata" hcl:"value"`
 }
 
 type formParam struct {
 	XMLName string `xml:"FormParam" hcl:"-"`
-	Name    string `xml:"name,attr" hcl"-"`
+	Name    string `xml:"name,attr" hcl:"-"`
 	Value   string `xml:",chardata" hcl:"value"`
 }
 
