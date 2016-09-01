@@ -41,13 +41,31 @@ func loadProxyEndpointsHCL(list *ast.ObjectList) ([]*ProxyEndpoint, error) {
 	var errors *multierror.Error
 	var result []*ProxyEndpoint
 	for _, item := range list.Items {
+		if len(item.Keys) == 0 || item.Keys[0].Token.Value() == "" {
+			pos := item.Val.Pos()
+			newError := hclerror.PosError{
+				Pos: pos,
+				Err: fmt.Errorf("proxy endpoint requires a name"),
+			}
+
+			errors = multierror.Append(errors, &newError)
+			continue
+		}
+
 		n := item.Keys[0].Token.Value().(string)
 
 		var listVal *ast.ObjectList
 		if ot, ok := item.Val.(*ast.ObjectType); ok {
 			listVal = ot.List
 		} else {
-			return nil, fmt.Errorf("proxy endpoint not an object")
+			pos := item.Val.Pos()
+			newError := hclerror.PosError{
+				Pos: pos,
+				Err: fmt.Errorf("proxy endpoint is not an object"),
+			}
+
+			errors = multierror.Append(errors, &newError)
+			return nil, errors
 		}
 
 		var proxyEndpoint ProxyEndpoint
@@ -61,76 +79,80 @@ func loadProxyEndpointsHCL(list *ast.ObjectList) ([]*ProxyEndpoint, error) {
 		if preFlow := listVal.Filter("pre_flow"); len(preFlow.Items) > 0 {
 			preFlow, err := loadPreFlowHCL(preFlow)
 			if err != nil {
-				return nil, err
+				errors = multierror.Append(errors, err)
+			} else {
+				proxyEndpoint.PreFlow = preFlow
 			}
-
-			proxyEndpoint.PreFlow = preFlow
 		}
 
 		if flows := listVal.Filter("flow"); len(flows.Items) > 0 {
 			flows, err := loadFlowsHCL(flows)
 			if err != nil {
-				return nil, err
+				errors = multierror.Append(errors, err)
+			} else {
+				proxyEndpoint.Flows = flows
 			}
-
-			proxyEndpoint.Flows = flows
 		}
 
 		if postFlow := listVal.Filter("post_flow"); len(postFlow.Items) > 0 {
 			postFlow, err := loadPostFlowHCL(postFlow)
 			if err != nil {
-				return nil, err
+				errors = multierror.Append(errors, err)
+			} else {
+				proxyEndpoint.PostFlow = postFlow
 			}
-
-			proxyEndpoint.PostFlow = postFlow
 		}
 
 		if postClientFlow := listVal.Filter("post_client_flow"); len(postClientFlow.Items) > 0 {
 			postClientFlow, err := loadPostClientFlowHCL(postClientFlow)
 			if err != nil {
-				return nil, err
+				errors = multierror.Append(errors, err)
+			} else {
+				proxyEndpoint.PostClientFlow = postClientFlow
 			}
-
-			proxyEndpoint.PostClientFlow = postClientFlow
 		}
 
 		if faultRulesList := listVal.Filter("fault_rule"); len(faultRulesList.Items) > 0 {
 			faultRules, err := loadFaultRulesHCL(faultRulesList)
 			if err != nil {
-				return nil, err
+				errors = multierror.Append(errors, err)
+			} else {
+				proxyEndpoint.FaultRules = faultRules
 			}
-
-			proxyEndpoint.FaultRules = faultRules
 		}
 
 		if defaultFaultRulesList := listVal.Filter("default_fault_rule"); len(defaultFaultRulesList.Items) > 0 {
 			faultRule, err := loadDefaultFaultRuleHCL(defaultFaultRulesList.Items[0])
 			if err != nil {
-				return nil, err
+				errors = multierror.Append(errors, err)
+			} else {
+				proxyEndpoint.DefaultFaultRule = faultRule
 			}
-
-			proxyEndpoint.DefaultFaultRule = faultRule
 		}
 
 		if hpcList := listVal.Filter("http_proxy_connection"); len(hpcList.Items) > 0 {
 			hpc, err := loadProxyEndpointHTTPProxyConnectionHCL(hpcList.Items[0])
 			if err != nil {
-				return nil, err
+				errors = multierror.Append(errors, err)
+			} else {
+				proxyEndpoint.HTTPProxyConnection = hpc
 			}
-
-			proxyEndpoint.HTTPProxyConnection = hpc
 		}
 
 		if routeRulesList := listVal.Filter("route_rule"); len(routeRulesList.Items) > 0 {
 			routeRules, err := loadProxyEndpointRouteRulesHCL(routeRulesList)
 			if err != nil {
-				return nil, err
+				errors = multierror.Append(errors, err)
+			} else {
+				proxyEndpoint.RouteRules = routeRules
 			}
-
-			proxyEndpoint.RouteRules = routeRules
 		}
 
 		result = append(result, &proxyEndpoint)
+	}
+
+	if errors != nil {
+		return nil, errors
 	}
 
 	return result, nil
