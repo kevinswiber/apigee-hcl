@@ -1,3 +1,5 @@
 proxy "hi" {}
 
-proxy_endpoint "" {}
+proxy_endpoint "hi" {}
+
+policy quota "" {}

@@ -2,6 +2,7 @@ package policy
 
 import (
 	"fmt"
+	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
 )
@@ -101,31 +102,35 @@ type assignTo struct {
 }
 
 func LoadAssignMessageHCL(item *ast.ObjectItem) (interface{}, error) {
+	var errors *multierror.Error
 	var p AssignMessagePolicy
 
 	if err := LoadCommonPolicyHCL(item, &p.Policy); err != nil {
-		return nil, err
+		errors = multierror.Append(errors, err)
+		return nil, errors
 	}
 
 	if err := hcl.DecodeObject(&p, item.Val.(*ast.ObjectType)); err != nil {
-		return nil, err
+		errors = multierror.Append(errors, err)
+		return nil, errors
 	}
 
 	var listVal *ast.ObjectList
 	if ot, ok := item.Val.(*ast.ObjectType); ok {
 		listVal = ot.List
 	} else {
-		return nil, fmt.Errorf("assign message policy not an object")
+		errors = multierror.Append(errors, fmt.Errorf("assign message policy not an object"))
+		return nil, errors
 	}
 
 	if addList := listVal.Filter("add"); len(addList.Items) > 0 {
 		item := addList.Items[0]
 		a, err := loadAssignMessageAddHCL(item)
 		if err != nil {
-			return nil, err
+			errors = multierror.Append(errors, err)
+		} else {
+			p.Add = a
 		}
-
-		p.Add = a
 	} else {
 		p.Add = nil
 	}
@@ -134,10 +139,10 @@ func LoadAssignMessageHCL(item *ast.ObjectItem) (interface{}, error) {
 		item := copyList.Items[0]
 		a, err := loadAssignMessageCopyHCL(item)
 		if err != nil {
-			return nil, err
+			errors = multierror.Append(errors, err)
+		} else {
+			p.Copy = a
 		}
-
-		p.Copy = a
 	} else {
 		p.Copy = nil
 	}
@@ -146,10 +151,10 @@ func LoadAssignMessageHCL(item *ast.ObjectItem) (interface{}, error) {
 		item := removeList.Items[0]
 		a, err := loadAssignMessageRemoveHCL(item)
 		if err != nil {
-			return nil, err
+			errors = multierror.Append(errors, err)
+		} else {
+			p.Remove = a
 		}
-
-		p.Remove = a
 	} else {
 		p.Remove = nil
 	}
@@ -158,12 +163,16 @@ func LoadAssignMessageHCL(item *ast.ObjectItem) (interface{}, error) {
 		item := setList.Items[0]
 		a, err := loadAssignMessageSetHCL(item)
 		if err != nil {
-			return nil, err
+			errors = multierror.Append(errors, err)
+		} else {
+			p.Set = a
 		}
-
-		p.Set = a
 	} else {
 		p.Set = nil
+	}
+
+	if errors != nil {
+		return nil, errors
 	}
 
 	return p, nil

@@ -71,7 +71,8 @@ func loadProxyEndpointsHCL(list *ast.ObjectList) ([]*ProxyEndpoint, error) {
 		var proxyEndpoint ProxyEndpoint
 
 		if err := hcl.DecodeObject(&proxyEndpoint, item.Val); err != nil {
-			return nil, err
+			errors = multierror.Append(errors, err)
+			return nil, errors
 		}
 
 		proxyEndpoint.Name = n

@@ -55,11 +55,13 @@ func LoadConfigFromHCL(list *ast.ObjectList) (*Config, error) {
 		var ps []interface{}
 
 		for _, item := range policies.Items {
-			if len(item.Keys) == 0 || item.Keys[0].Token.Value() == "" {
+			if len(item.Keys) < 2 ||
+				item.Keys[0].Token.Value() == "" ||
+				item.Keys[1].Token.Value() == "" {
 				pos := item.Val.Pos()
 				newError := hclerror.PosError{
 					Pos: pos,
-					Err: fmt.Errorf("policy requires a name"),
+					Err: fmt.Errorf("policy requires a type and name"),
 				}
 
 				errors = multierror.Append(errors, &newError)
