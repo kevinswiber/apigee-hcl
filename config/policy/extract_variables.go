@@ -8,6 +8,9 @@ import (
 	"github.com/kevinswiber/apigee-hcl/config/hclerror"
 )
 
+// ExtractVariablesPolicy represents an <ExtractVariables/> element.
+//
+// Documentation: http://docs.apigee.com/api-services/reference/extract-variables-policy
 type ExtractVariablesPolicy struct {
 	XMLName                   string `xml:"ExtractVariables" hcl:"-"`
 	Policy                    `hcl:",squash"`
@@ -96,6 +99,7 @@ type evPattern struct {
 	Value      string `xml:",chardata" hcl:"value"`
 }
 
+// LoadExtractVariablesHCL converts an HCL ast.ObjectItem into an ExtractVariablesPolicy object.
 func LoadExtractVariablesHCL(item *ast.ObjectItem) (interface{}, error) {
 	var errors *multierror.Error
 	var p ExtractVariablesPolicy

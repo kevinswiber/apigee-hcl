@@ -7,6 +7,9 @@ import (
 	"github.com/kevinswiber/apigee-hcl/config/common"
 )
 
+// JavaScriptPolicy represents a <Javascript/> element.
+//
+// Documentation: http://docs.apigee.com/api-services/reference/javascript-policy
 type JavaScriptPolicy struct {
 	XMLName     string `xml:"Javascript" hcl:"-"`
 	Policy      `hcl:",squash"`
@@ -18,6 +21,7 @@ type JavaScriptPolicy struct {
 	Content     string             `xml:"-" hcl:"content"`
 }
 
+// LoadJavaScriptHCL converts HCL into an JavaScriptPolicy object.
 func LoadJavaScriptHCL(item *ast.ObjectItem) (interface{}, error) {
 	var p JavaScriptPolicy
 

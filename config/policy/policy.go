@@ -6,6 +6,9 @@ import (
 	"github.com/hashicorp/hcl/hcl/ast"
 )
 
+// Policy Represents a base Policy element. Each policy type should embed a Policy.
+//
+// Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#policies
 type Policy struct {
 	Name            string `xml:"name,attr,omitempty" hcl:"-"`
 	Enabled         bool   `xml:"enabled,attr" hcl:"enabled"`
@@ -13,6 +16,7 @@ type Policy struct {
 	Async           bool   `xml:"async,attr,omitempty" hcl:"async"`
 }
 
+// LoadCommonPolicyHCL converts an HCL ast.ObjectItem into a Policy object.
 func LoadCommonPolicyHCL(item *ast.ObjectItem, p *Policy) error {
 
 	if err := hcl.DecodeObject(p, item.Val.(*ast.ObjectType)); err != nil {

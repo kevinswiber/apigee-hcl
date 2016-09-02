@@ -5,6 +5,9 @@ import (
 	"github.com/hashicorp/hcl/hcl/ast"
 )
 
+// ResponseCachePolicy represents a <ResponseCache/> element.
+//
+// Documentation: http://docs.apigee.com/api-services/reference/response-cache-policy
 type ResponseCachePolicy struct {
 	XMLName                     string `xml:"ResponseCache" hcl:"-"`
 	Policy                      `hcl:",squash"`
@@ -59,6 +62,7 @@ type expiryDate struct {
 	Value   string `xml:",chardata" hcl:"value"`
 }
 
+// LoadResponseCacheHCL converts an HCL ast.ObjectItem into a ResponseCachePolicy
 func LoadResponseCacheHCL(item *ast.ObjectItem) (interface{}, error) {
 	var p ResponseCachePolicy
 

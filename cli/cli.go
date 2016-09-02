@@ -18,24 +18,29 @@ import (
 	"strings"
 )
 
+// InputValues is an array of input files
 type InputValues []string
 
+// String is part of an implementation of the flag.Value interface
 func (v *InputValues) String() string {
 	return ""
 }
 
+// Set is part of an implementation of the flag.Value interface
 func (v *InputValues) Set(value string) error {
 	*v = append(*v, value)
 	return nil
 }
 
-type CLIOptions struct {
+// Options is an arguments container for running the CLI.
+type Options struct {
 	InputHCL      InputValues
 	BuildPath     string
 	ResourcesPath string
 }
 
-func StartCLI(opts *CLIOptions) {
+// Start runs the command line utility logic.
+func Start(opts *Options) {
 	var errors error
 	l := log.New(os.Stderr, "", 0)
 

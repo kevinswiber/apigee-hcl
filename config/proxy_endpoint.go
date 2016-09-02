@@ -9,6 +9,9 @@ import (
 	"github.com/kevinswiber/apigee-hcl/config/hclerror"
 )
 
+// ProxyEndpoint represents a <ProxyEndpoint/> element.
+//
+// Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#proxyendpoint
 type ProxyEndpoint struct {
 	XMLName             string               `xml:"ProxyEndpoint" hcl:"-"`
 	Name                string               `xml:"name,attr" hcl:"-"`
@@ -22,6 +25,10 @@ type ProxyEndpoint struct {
 	RouteRules          []*RouteRule         `xml:"RouteRule" hcl:"route_rule"`
 }
 
+// HTTPProxyConnection represents an <HTTPProxyConnection/> element
+// in a ProxyEndpoint.
+//
+// Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#proxyendpoint-proxyendpointconfigurationelements
 type HTTPProxyConnection struct {
 	XMLName      string             `xml:"HTTPProxyConnection" hcl:"-"`
 	BasePath     string             `hcl:"base_path"`
@@ -29,6 +36,9 @@ type HTTPProxyConnection struct {
 	Properties   []*common.Property `xml:"Properties>Property" hcl:"properties"`
 }
 
+// RouteRule represents a <RouteRule/> element in an HTTPProxyConnection
+//
+// Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#proxyendpoint-proxyendpointconfigurationelements
 type RouteRule struct {
 	XMLName        string `xml:"RouteRule"`
 	Name           string `xml:"name,attr", hcl:"-"`

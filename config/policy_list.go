@@ -5,6 +5,7 @@ import (
 	"github.com/kevinswiber/apigee-hcl/config/policy"
 )
 
+// PolicyList is a map of HCL policy types to HCL loader functions.
 var PolicyList = map[string]func(*ast.ObjectItem) (interface{}, error){
 	"assign_message":    policy.LoadAssignMessageHCL,
 	"extract_variables": policy.LoadExtractVariablesHCL,

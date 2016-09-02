@@ -7,6 +7,9 @@ import (
 	"github.com/hashicorp/hcl/hcl/ast"
 )
 
+// QuotaPolicy represents a <Quota/> element.
+//
+// Documentation: http://docs.apigee.com/api-services/reference/quota-policy
 type QuotaPolicy struct {
 	XMLName                   string `xml:"Quota" hcl:"-"`
 	Policy                    `hcl:",squash"`
@@ -70,6 +73,7 @@ type messageWeight struct {
 	Ref     string `xml:"ref,attr,omitempty" hcl:"ref"`
 }
 
+// LoadQuotaHCL converts an HCL ast.ObjectItem into a QuotaPolicy object.
 func LoadQuotaHCL(item *ast.ObjectItem) (interface{}, error) {
 	var errors *multierror.Error
 	var p QuotaPolicy
