@@ -9,6 +9,9 @@ import (
 	"github.com/kevinswiber/apigee-hcl/config/hclerror"
 )
 
+// TargetEndpoint represents a <TargetEndpoint/> element.
+//
+// Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#targetendpoint
 type TargetEndpoint struct {
 	XMLName               string                 `xml:"TargetEndpoint" hcl:"-"`
 	Name                  string                 `xml:"name,attr" hcl:"-"`
@@ -23,6 +26,10 @@ type TargetEndpoint struct {
 	SSLInfo               *SSLInfo               `xml:",omitempty" hcl:"ssl_info"`
 }
 
+// HTTPTargetConnection represents an <HTTPTargetConnection/> element
+// in a TargetEndpoint.
+//
+// Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#targetendpoint-targetendpointconfigurationelements
 type HTTPTargetConnection struct {
 	XMLName      string             `xml:"HTTPTargetConnection" hcl:"-"`
 	URL          string             `hcl:"url"`
@@ -30,6 +37,10 @@ type HTTPTargetConnection struct {
 	Properties   []*common.Property `xml:"Properties>Property" hcl:"properties"`
 }
 
+// LoadBalancer represents a <LoadBalancer/> element in an
+// HTTPTargetConnection.
+//
+// Documentation: http://docs.apigee.com/api-platform/content/load-balance-api-traffic-across-multiple-backend-servers#configuringatargetendpointtoloadbalanceacrossnamedtargetservers
 type LoadBalancer struct {
 	XMLName      string                `xml:"LoadBalancer" hcl:"-"`
 	Algorithm    string                `hcl:"algorithm"`
@@ -38,6 +49,10 @@ type LoadBalancer struct {
 	RetryEnabled bool                  `xml:",omitempty" hcl:"retry_enabled"`
 }
 
+// LocalTargetConnection represents a <LocalTargetConnection/> element
+// in a TargetEndpoint.
+//
+// Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#targetendpoint-targetendpointconfigurationelements
 type LocalTargetConnection struct {
 	XMLName       string `xml:"LocalTargetConnection" hcl:"-"`
 	APIProxy      string `xml:",omitempty" hcl:"api_proxy"`
@@ -45,6 +60,9 @@ type LocalTargetConnection struct {
 	Path          string `xml:",omitempty" hcl:"path"`
 }
 
+// ScriptTarget represents a <ScriptTarget/> element in a TargetEndpoint.
+//
+// Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#targetendpoint-targetendpointconfigurationelements
 type ScriptTarget struct {
 	XMLName              string                 `xml:"ScriptTarget" hcl:"-"`
 	ResourceURL          string                 `hcl:"resource_url"`
@@ -52,6 +70,9 @@ type ScriptTarget struct {
 	Arguments            []string               `xml:"Arguments>Argument" hcl:"arguments"`
 }
 
+// SSLInfo represents an <SSLInfo/> element in a TargetEndpoint.
+//
+// Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#tlsssltargetendpointconfiguration-tlsssltargetendpointconfigurationelements
 type SSLInfo struct {
 	XMLName           string   `xml:"SSLInfo" hcl:"-"`
 	Enabled           bool     `xml:",omitempty" hcl:"enabled"`
@@ -63,12 +84,20 @@ type SSLInfo struct {
 	Protocols         []string `xml:"Protocols>Protocol" hcl:"protocols"`
 }
 
+// EnvironmentVariable represents an <EnvironmentVariable/> element
+// in a ScriptTarget.
+//
+// Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#targetendpoint-targetendpointconfigurationelements
 type EnvironmentVariable struct {
 	XMLName string      `xml:"EnvironmentVariable" hcl:"-"`
 	Name    string      `xml:"name,attr" hcl:",key"`
 	Value   interface{} `xml:",chardata" hcl:"-"`
 }
 
+// LoadBalancerServer represents a <LoadBalancerServer/> element
+// in a LoadBalancer.
+//
+// Documentation: http://docs.apigee.com/api-platform/content/load-balance-api-traffic-across-multiple-backend-servers#configuringatargetendpointtoloadbalanceacrossnamedtargetservers
 type LoadBalancerServer struct {
 	XMLName    string `xml:"Server" hcl:"-"`
 	Name       string `xml:"name,attr" hcl:"-"`

@@ -7,12 +7,20 @@ import (
 	"github.com/hashicorp/hcl/hcl/ast"
 )
 
+// PreFlow represents a <PreFlow/> element for
+// ProxyEndpoint and TargetEndpoint definitions.
+//
+// Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#flows
 type PreFlow struct {
 	XMLName  string       `xml:"PreFlow" hcl:"-"`
 	Request  FlowRequest  `hcl:"request"`
 	Response FlowResponse `hcl:"response"`
 }
 
+// Flow represents a <Flow/> element for
+// ProxyEndpoint and TargetEndpoint definitions.
+//
+// Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#flows
 type Flow struct {
 	XMLName   string       `xml:"Flow" hcl:"-"`
 	Name      string       `xml:"name,attr" hcl:"-"`
@@ -21,18 +29,30 @@ type Flow struct {
 	Response  FlowResponse `hcl:"response"`
 }
 
+// PostFlow represents a <PostFlow/> element for
+// ProxyEndpoint and TargetEndpoint definitions.
+//
+// Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#flows
 type PostFlow struct {
 	XMLName  string       `xml:"PostFlow" hcl:"-"`
 	Request  FlowRequest  `hcl:"request"`
 	Response FlowResponse `hcl:"response"`
 }
 
+// PostClientFlow represents a <PostClientFlow/> element for
+// ProxyEndpoint definitions.
+//
+// Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#flows
 type PostClientFlow struct {
 	XMLName  string       `xml:"PostClientFlow" hcl:"-"`
 	Request  FlowRequest  `hcl:"request"`
 	Response FlowResponse `hcl:"response"`
 }
 
+// FaultRule represents a <FaultRule/> element for
+// ProxyEndpoint and TargetEndpoint definitions.
+//
+// Documentation: http://docs.apigee.com/api-services/content/fault-handling
 type FaultRule struct {
 	XMLName   string      `xml:"FaultRule" hcl:"-"`
 	Name      string      `xml:"name,attr" hcl:"-"`
@@ -40,6 +60,10 @@ type FaultRule struct {
 	Steps     []*FlowStep `xml:",innerxml" hcl:"step"`
 }
 
+// DefaultFaultRule represents a <DefaultFaultRule/> element for
+// ProxyEndpoint and TargetEndpoint definitions.
+//
+// Documentation: http://docs.apigee.com/api-services/content/fault-handling
 type DefaultFaultRule struct {
 	XMLName       string      `xml:"DefaultFaultRule" hcl:"-"`
 	Name          string      `xml:"name,attr" hcl:"-"`
@@ -48,17 +72,30 @@ type DefaultFaultRule struct {
 	AlwaysEnforce bool        `xml:",omitempty" hcl:"always_enforce"`
 }
 
+// FlowStep represents a <Step/> element for
+// Request and Response flows in ProxyEndpoint and
+// TargetEndpoint definitions.
+//
+// Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#policies-policyattachment
 type FlowStep struct {
 	XMLName   string `xml:"Step"`
 	Name      string
 	Condition string `xml:",omitempty" hcl:"condition"`
 }
 
+// FlowRequest represents a <Request/> element for
+// PreFlow, Flow, PostFlow, and PostClientFlow definitions
+//
+// Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#watchaquickhowtovideo-flowconfigurationelements
 type FlowRequest struct {
 	XMLName string      `xml:"Request" hcl:"-"`
 	Steps   []*FlowStep `xml:",innerxml" hcl:"step"`
 }
 
+// FlowResponse represents a <Response/> element for
+// PreFlow, Flow, PostFlow, and PostClientFlow definitions
+//
+// Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#watchaquickhowtovideo-flowconfigurationelements
 type FlowResponse struct {
 	XMLName string      `xml:"Response" hcl:"-"`
 	Steps   []*FlowStep `xml:",innerxml" hcl:"step"`

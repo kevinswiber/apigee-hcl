@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	var options cli.CLIOptions
+	var options cli.Options
 
 	flag.Var(&options.InputHCL, "i", "Required. An HCL file to translate")
 	flag.StringVar(&options.BuildPath, "o", path.Join(".", "build"), "Optional. A build path")
@@ -19,5 +19,5 @@ func main() {
 		return
 	}
 
-	cli.StartCLI(&options)
+	cli.Start(&options)
 }

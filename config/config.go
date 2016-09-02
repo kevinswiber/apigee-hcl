@@ -8,6 +8,7 @@ import (
 	"github.com/kevinswiber/apigee-hcl/config/policy"
 )
 
+// Config is a container for holding the contents of an exported Apigee proxy bundle
 type Config struct {
 	Proxy           *Proxy
 	ProxyEndpoints  []*ProxyEndpoint
@@ -16,6 +17,7 @@ type Config struct {
 	Resources       map[string]string
 }
 
+// LoadConfigFromHCL converts an HCL ast.ObjectList into a Config object
 func LoadConfigFromHCL(list *ast.ObjectList) (*Config, error) {
 	var errors *multierror.Error
 

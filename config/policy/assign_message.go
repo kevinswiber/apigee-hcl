@@ -7,6 +7,9 @@ import (
 	"github.com/hashicorp/hcl/hcl/ast"
 )
 
+// AssignMessagePolicy represents an <AssignMessage/> element.
+//
+// Documentation: http://docs.apigee.com/api-services/reference/assign-message-policy
 type AssignMessagePolicy struct {
 	XMLName                   string `xml:"AssignMessage" hcl:"-"`
 	Policy                    `hcl:",squash"`
@@ -101,6 +104,7 @@ type assignTo struct {
 	Value     string `xml:",chardata" hcl:"value"`
 }
 
+// LoadAssignMessageHCL converts an HCL ast.ObjectItem into an AssignMessagePolicy object.
 func LoadAssignMessageHCL(item *ast.ObjectItem) (interface{}, error) {
 	var errors *multierror.Error
 	var p AssignMessagePolicy

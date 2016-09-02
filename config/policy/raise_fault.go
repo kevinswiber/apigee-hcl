@@ -7,6 +7,9 @@ import (
 	"github.com/hashicorp/hcl/hcl/ast"
 )
 
+// RaiseFaultPolicy represents a <RaiseFaultPolicy/> element.
+//
+// Documentation: http://docs.apigee.com/api-services/reference/raise-fault-policy
 type RaiseFaultPolicy struct {
 	XMLName                   string `xml:"RaiseFault" hcl:"-"`
 	Policy                    `hcl:",squash"`
@@ -42,6 +45,7 @@ type raiseFaultSet struct {
 	ReasonPhrase string    `xml:",omitempty" hcl:"reason_phrase"`
 }
 
+// LoadRaiseFaultHCL converts an HCL ast.ObjectItem into a RaiseFaultPolicy.
 func LoadRaiseFaultHCL(item *ast.ObjectItem) (interface{}, error) {
 	var p RaiseFaultPolicy
 

@@ -8,6 +8,9 @@ import (
 	"github.com/kevinswiber/apigee-hcl/config/hclerror"
 )
 
+// Proxy represents an <APIProxy/> element in an Apigee proxy bundle
+//
+// Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#baseconfig
 type Proxy struct {
 	XMLName     string `xml:"APIProxy", hcl:"-"`
 	Name        string `xml:"name,attr,omitempty" hcl:"-"`

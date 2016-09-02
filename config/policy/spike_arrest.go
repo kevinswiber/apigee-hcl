@@ -5,6 +5,9 @@ import (
 	"github.com/hashicorp/hcl/hcl/ast"
 )
 
+// SpikeArrestPolicy represents a <SpikeArrest/> element.
+//
+// Documentation: http://docs.apigee.com/api-services/reference/spike-arrest-policy
 type SpikeArrestPolicy struct {
 	XMLName       string `xml:"SpikeArrest" hcl:"-"`
 	Policy        `hcl:",squash"`
@@ -30,6 +33,7 @@ type spikeRate struct {
 	Value   string `xml:",chardata" hcl:"value"`
 }
 
+// LoadSpikeArrestHCL converts an HCL ast.ObjectItem into a SpikeArrestPolicy object.
 func LoadSpikeArrestHCL(item *ast.ObjectItem) (interface{}, error) {
 	var p SpikeArrestPolicy
 

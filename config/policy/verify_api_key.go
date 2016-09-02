@@ -5,6 +5,9 @@ import (
 	"github.com/hashicorp/hcl/hcl/ast"
 )
 
+// VerifyAPIKeyPolicy represents a <VerifyAPIKey/> element.
+//
+// Documentation: http://docs.apigee.com/api-services/reference/verify-api-key-policy
 type VerifyAPIKeyPolicy struct {
 	XMLName     string `xml:"VerifyAPIKey" hcl:"-"`
 	Policy      `hcl:",squash"`
@@ -18,6 +21,7 @@ type apikey struct {
 	Value   string `xml:",chardata" hcl:"value"`
 }
 
+// LoadVerifyAPIKeyHCL converts an HCL ast.ObjectItem into a VerifyAPIKeyPolicy object.
 func LoadVerifyAPIKeyHCL(item *ast.ObjectItem) (interface{}, error) {
 	var p VerifyAPIKeyPolicy
 
