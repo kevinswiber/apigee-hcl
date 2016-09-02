@@ -93,7 +93,7 @@ If you have Go v1.6+ installed, simply:
 
 - [x] Assign Message
 - [x] JavaScript
-- [ ] Extract Variables
+- [x] Extract Variables
 - [x] Raise Fault
 - [ ] Service Callout
 - [ ] OAuth v2.0
