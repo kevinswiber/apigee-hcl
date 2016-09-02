@@ -6,12 +6,13 @@ import (
 )
 
 var PolicyList = map[string]func(*ast.ObjectItem) (interface{}, error){
-	"assign_message": policy.LoadAssignMessageHCL,
-	"quota":          policy.LoadQuotaHCL,
-	"script":         policy.LoadScriptHCL,
-	"javascript":     policy.LoadJavaScriptHCL,
-	"verify_api_key": policy.LoadVerifyAPIKeyHCL,
-	"spike_arrest":   policy.LoadSpikeArrestHCL,
-	"response_cache": policy.LoadResponseCacheHCL,
-	"raise_fault":    policy.LoadRaiseFaultHCL,
+	"assign_message":    policy.LoadAssignMessageHCL,
+	"extract_variables": policy.LoadExtractVariablesHCL,
+	"javascript":        policy.LoadJavaScriptHCL,
+	"quota":             policy.LoadQuotaHCL,
+	"raise_fault":       policy.LoadRaiseFaultHCL,
+	"response_cache":    policy.LoadResponseCacheHCL,
+	"script":            policy.LoadScriptHCL,
+	"spike_arrest":      policy.LoadSpikeArrestHCL,
+	"verify_api_key":    policy.LoadVerifyAPIKeyHCL,
 }
