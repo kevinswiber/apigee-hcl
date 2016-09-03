@@ -70,6 +70,15 @@ func LoadXMLToJSONHCL(item *ast.ObjectItem) (interface{}, error) {
 		return nil, &newError
 	}
 
+	if p.Options == nil && p.Format == "" {
+		pos := item.Val.Pos()
+		newError := hclerror.PosError{
+			Pos: pos,
+			Err: fmt.Errorf("xml_to_json must specify either options or format"),
+		}
+		return nil, &newError
+	}
+
 	if p.Options != nil && p.Options.NamespaceBlockName != "" {
 		if p.Options.DefaultNamespaceNodeName == "" ||
 			p.Options.NamespaceSeparator == "" {
@@ -80,7 +89,6 @@ func LoadXMLToJSONHCL(item *ast.ObjectItem) (interface{}, error) {
 					"namespace_separator when namespace_block_name is used"),
 			}
 			return nil, &newError
-
 		}
 	}
 

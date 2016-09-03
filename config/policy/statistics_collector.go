@@ -16,7 +16,7 @@ type StatisticsCollectorPolicy struct {
 	XMLName     string `xml:"StatisticsCollector" hcl:"-"`
 	Policy      `hcl:",squash"`
 	DisplayName string         `xml:",omitempty" hcl:"display_name"`
-	Statistics  []*scStatistic `xml:"Statistics>Statistic", hcl:"statistic"`
+	Statistics  []*scStatistic `xml:"Statistics>Statistic" hcl:"statistic"`
 }
 
 type scStatistic struct {
