@@ -41,7 +41,7 @@ type HTTPProxyConnection struct {
 // Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#proxyendpoint-proxyendpointconfigurationelements
 type RouteRule struct {
 	XMLName        string `xml:"RouteRule"`
-	Name           string `xml:"name,attr", hcl:"-"`
+	Name           string `xml:"name,attr" hcl:"-"`
 	Condition      string `xml:",omitempty" hcl:"condition"`
 	TargetEndpoint string `xml:",omitempty" hcl:"target_endpoint"`
 	URL            string `xml:",omitempty" hcl:"url"`
