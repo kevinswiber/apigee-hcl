@@ -1,4 +1,4 @@
-package config
+package endpoints
 
 import (
 	"fmt"
@@ -47,7 +47,8 @@ type RouteRule struct {
 	URL            string `xml:",omitempty" hcl:"url"`
 }
 
-func loadProxyEndpointsHCL(list *ast.ObjectList) ([]*ProxyEndpoint, error) {
+// LoadProxyEndpointsHCL converts an HCL ast.ObjectList into ProxyEndpoint objects
+func LoadProxyEndpointsHCL(list *ast.ObjectList) ([]*ProxyEndpoint, error) {
 	var errors *multierror.Error
 	var result []*ProxyEndpoint
 	for _, item := range list.Items {
