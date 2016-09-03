@@ -25,7 +25,7 @@ type ServiceCalloutPolicy struct {
 type scRequest struct {
 	XMLName                   string  `xml:"Request" hcl:"-"`
 	ClearPayload              bool    `xml:"clearPayload,attr,omitempty" hcl:"clear_payload"`
-	Variable                  string  `xml:",omitempty" hcl:"variable"`
+	Variable                  string  `xml:"variable,attr,omitempty" hcl:"variable"`
 	Add                       *add    `xml:",omitempty" hcl:"add"`
 	Copy                      *copy   `xml:",omitempty" hcl:"copy"`
 	Remove                    *remove `xml:",omitempty" hcl:"remove"`
@@ -88,10 +88,16 @@ func loadServiceCalloutRequestHCL(item *ast.ObjectItem) (*scRequest, error) {
 	var r scRequest
 	var errors *multierror.Error
 	var listVal *ast.ObjectList
+
 	if ot, ok := item.Val.(*ast.ObjectType); ok {
 		listVal = ot.List
 	} else {
 		errors = multierror.Append(errors, fmt.Errorf("service_callout policy not an object"))
+		return nil, errors
+	}
+
+	if err := hcl.DecodeObject(&r, item.Val.(*ast.ObjectType)); err != nil {
+		errors = multierror.Append(errors, err)
 		return nil, errors
 	}
 

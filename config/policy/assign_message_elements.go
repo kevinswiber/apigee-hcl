@@ -7,45 +7,45 @@ import (
 )
 
 type add struct {
-	XMLName     string        `xml:"Add" hcl:"-"`
-	Headers     []*header     `xml:"Headers>Header" hcl:"header"`
-	QueryParams []*queryParam `xml:"QueryParams>QueryParam" hcl:"query_param"`
-	FormParams  []*formParam  `xml:"FormParams>FormParam" hcl:"form_param"`
+	XMLName     string         `xml:"Add" hcl:"-"`
+	Headers     *[]*header     `xml:"Headers>Header" hcl:"header"`
+	QueryParams *[]*queryParam `xml:"QueryParams>QueryParam" hcl:"query_param"`
+	FormParams  *[]*formParam  `xml:"FormParams>FormParam" hcl:"form_param"`
 }
 
 type copy struct {
-	XMLName      string        `xml:"Copy" hcl:"-"`
-	Source       string        `xml:"source,attr,omitempty" hcl:"-"`
-	Headers      []*header     `xml:"Headers>Header" hcl:"header"`
-	QueryParams  []*queryParam `xml:"QueryParams>QueryParam" hcl:"query_param"`
-	FormParams   []*formParam  `xml:"FormParams>FormParam" hcl:"form_param"`
-	Payload      bool          `xml:",omitempty" hcl:"payload"`
-	Version      bool          `xml:",omitempty" hcl:"version"`
-	Verb         bool          `xml:",omitempty" hcl:"verb"`
-	Path         bool          `xml:",omitempty" hcl:"path"`
-	StatusCode   bool          `xml:",omitempty" hcl:"status_code"`
-	ReasonPhrase bool          `xml:",omitempty" hcl:"reason_phrase"`
+	XMLName      string         `xml:"Copy" hcl:"-"`
+	Source       string         `xml:"source,attr,omitempty" hcl:"-"`
+	Headers      *[]*header     `xml:"Headers>Header" hcl:"header"`
+	QueryParams  *[]*queryParam `xml:"QueryParams>QueryParam" hcl:"query_param"`
+	FormParams   *[]*formParam  `xml:"FormParams>FormParam" hcl:"form_param"`
+	Payload      bool           `xml:",omitempty" hcl:"payload"`
+	Version      bool           `xml:",omitempty" hcl:"version"`
+	Verb         bool           `xml:",omitempty" hcl:"verb"`
+	Path         bool           `xml:",omitempty" hcl:"path"`
+	StatusCode   bool           `xml:",omitempty" hcl:"status_code"`
+	ReasonPhrase bool           `xml:",omitempty" hcl:"reason_phrase"`
 }
 
 type remove struct {
-	XMLName     string        `xml:"Remove" hcl:"-"`
-	Headers     []*header     `xml:"Headers>Header" hcl:"header"`
-	QueryParams []*queryParam `xml:"QueryParams>QueryParam" hcl:"query_param"`
-	FormParams  []*formParam  `xml:"FormParams>FormParam" hcl:"form_param"`
-	Payload     bool          `xml:",omitempty" hcl:"payload"`
+	XMLName     string         `xml:"Remove" hcl:"-"`
+	Headers     *[]*header     `xml:"Headers>Header" hcl:"header"`
+	QueryParams *[]*queryParam `xml:"QueryParams>QueryParam" hcl:"query_param"`
+	FormParams  *[]*formParam  `xml:"FormParams>FormParam" hcl:"form_param"`
+	Payload     bool           `xml:",omitempty" hcl:"payload"`
 }
 
 type set struct {
-	XMLName      string        `xml:"Set" hcl:"-"`
-	Headers      []*header     `xml:"Headers>Header" hcl:"header"`
-	QueryParams  []*queryParam `xml:"QueryParams>QueryParam" hcl:"query_param"`
-	FormParams   []*formParam  `xml:"FormParams>FormParam" hcl:"form_param"`
-	Payload      *payload      `xml:",omitempty" hcl:"payload"`
-	Version      string        `xml:",omitempty" hcl:"version"`
-	Verb         string        `xml:",omitempty" hcl:"verb"`
-	Path         string        `xml:",omitempty" hcl:"path"`
-	StatusCode   int           `xml:",omitempty" hcl:"status_code"`
-	ReasonPhrase string        `xml:",omitempty" hcl:"reason_phrase"`
+	XMLName      string         `xml:"Set" hcl:"-"`
+	Headers      *[]*header     `xml:"Headers>Header" hcl:"header"`
+	QueryParams  *[]*queryParam `xml:"QueryParams>QueryParam" hcl:"query_param"`
+	FormParams   *[]*formParam  `xml:"FormParams>FormParam" hcl:"form_param"`
+	Payload      *payload       `xml:",omitempty" hcl:"payload"`
+	Version      string         `xml:",omitempty" hcl:"version"`
+	Verb         string         `xml:",omitempty" hcl:"verb"`
+	Path         string         `xml:",omitempty" hcl:"path"`
+	StatusCode   int            `xml:",omitempty" hcl:"status_code"`
+	ReasonPhrase string         `xml:",omitempty" hcl:"reason_phrase"`
 }
 
 type payload struct {
@@ -215,7 +215,7 @@ func loadAssignMessageSetHCL(item *ast.ObjectItem) (*set, error) {
 	return &result, nil
 }
 
-func loadHeadersHCL(listVal *ast.ObjectList) ([]*header, error) {
+func loadHeadersHCL(listVal *ast.ObjectList) (*[]*header, error) {
 	var headers []*header
 	if headerList := listVal.Filter("header"); len(headerList.Items) > 0 {
 		for _, h := range headerList.Items {
@@ -227,12 +227,14 @@ func loadHeadersHCL(listVal *ast.ObjectList) ([]*header, error) {
 
 			headers = append(headers, &hdr)
 		}
+	} else {
+		return nil, nil
 	}
 
-	return headers, nil
+	return &headers, nil
 }
 
-func loadQueryParamsHCL(listVal *ast.ObjectList) ([]*queryParam, error) {
+func loadQueryParamsHCL(listVal *ast.ObjectList) (*[]*queryParam, error) {
 	var qparams []*queryParam
 	if qparamList := listVal.Filter("query_param"); len(qparamList.Items) > 0 {
 		for _, q := range qparamList.Items {
@@ -244,12 +246,14 @@ func loadQueryParamsHCL(listVal *ast.ObjectList) ([]*queryParam, error) {
 
 			qparams = append(qparams, &qparam)
 		}
+	} else {
+		return nil, nil
 	}
 
-	return qparams, nil
+	return &qparams, nil
 }
 
-func loadFormParamsHCL(listVal *ast.ObjectList) ([]*formParam, error) {
+func loadFormParamsHCL(listVal *ast.ObjectList) (*[]*formParam, error) {
 	var fparams []*formParam
 	if fparamList := listVal.Filter("form_param"); len(fparamList.Items) > 0 {
 		for _, f := range fparamList.Items {
@@ -261,7 +265,9 @@ func loadFormParamsHCL(listVal *ast.ObjectList) ([]*formParam, error) {
 
 			fparams = append(fparams, &fparam)
 		}
+	} else {
+		return nil, nil
 	}
 
-	return fparams, nil
+	return &fparams, nil
 }
