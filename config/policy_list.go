@@ -18,4 +18,5 @@ var PolicyList = map[string]func(*ast.ObjectItem) (interface{}, error){
 	"spike_arrest":         policy.LoadSpikeArrestHCL,
 	"statistics_collector": policy.LoadStatisticsCollectorHCL,
 	"verify_api_key":       policy.LoadVerifyAPIKeyHCL,
+	"xml_to_json":          policy.LoadXMLToJSONHCL,
 }

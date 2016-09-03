@@ -99,7 +99,7 @@ If you have Go v1.6+ installed, simply:
 - [ ] OAuth v2.0
 - [x] Verify API Key
 - [x] Response Cache
-- [ ] XML to JSON
+- [x] XML to JSON
 - [x] Spike Arrest
 - [x] Quota
 - [ ] XSL Transform
