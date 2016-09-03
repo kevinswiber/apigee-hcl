@@ -104,7 +104,7 @@ If you have Go v1.6+ installed, simply:
 - [x] Quota
 - [ ] XSL Transform
 - [ ] Basic Authentication
-- [ ] Statistics Collector
+- [x] Statistics Collector
 - [ ] Key Value Map Operations
 - [ ] Message Logging
 - [ ] Populate Cache
