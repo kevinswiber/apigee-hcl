@@ -5,7 +5,6 @@ import (
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
-	"github.com/kevinswiber/apigee-hcl/config/common"
 	"github.com/kevinswiber/apigee-hcl/config/endpoints"
 )
 
@@ -70,7 +69,7 @@ func LoadServiceCalloutHCL(item *ast.ObjectItem) (interface{}, error) {
 	}
 
 	if htcList := listVal.Filter("http_target_connection"); len(htcList.Items) > 0 {
-		htc, err := loadServiceCalloutHTTPTargetConnectionHCL(htcList.Items[0])
+		htc, err := endpoints.LoadHTTPTargetConnectionHCL(htcList.Items[0])
 		if err != nil {
 			errors = multierror.Append(errors, err)
 		} else {
@@ -149,60 +148,4 @@ func loadServiceCalloutRequestHCL(item *ast.ObjectItem) (*scRequest, error) {
 	}
 
 	return &r, nil
-}
-
-func loadServiceCalloutHTTPTargetConnectionHCL(item *ast.ObjectItem) (*endpoints.HTTPTargetConnection, error) {
-	var htc endpoints.HTTPTargetConnection
-
-	if err := hcl.DecodeObject(&htc, item.Val); err != nil {
-		return nil, fmt.Errorf("error decoding http target connection")
-	}
-
-	var listVal *ast.ObjectList
-	if ot, ok := item.Val.(*ast.ObjectType); ok {
-		listVal = ot.List
-	} else {
-		return nil, fmt.Errorf("http target connection not an object")
-	}
-
-	if propsList := listVal.Filter("properties"); len(propsList.Items) > 0 {
-		props, err := common.LoadPropertiesHCL(propsList.Items[0])
-		if err != nil {
-			return nil, err
-		}
-
-		htc.Properties = props
-	}
-
-	if lbList := listVal.Filter("load_balancer"); len(lbList.Items) > 0 {
-		var lb endpoints.LoadBalancer
-		if err := hcl.DecodeObject(&lb, lbList.Items[0]); err != nil {
-			return nil, err
-		}
-
-		var lbListVal *ast.ObjectList
-		if ot, ok := lbList.Items[0].Val.(*ast.ObjectType); ok {
-			lbListVal = ot.List
-		} else {
-			return nil, fmt.Errorf("load balancer not an object")
-		}
-
-		var lbServers []*endpoints.LoadBalancerServer
-		if serversList := lbListVal.Filter("server"); len(serversList.Items) > 0 {
-			for _, item := range serversList.Items {
-				var s endpoints.LoadBalancerServer
-				if err := hcl.DecodeObject(&s, item); err != nil {
-					return nil, err
-				}
-				s.Name = item.Keys[0].Token.Value().(string)
-				lbServers = append(lbServers, &s)
-			}
-
-			lb.Servers = lbServers
-		}
-
-		htc.LoadBalancer = &lb
-	}
-
-	return &htc, nil
 }

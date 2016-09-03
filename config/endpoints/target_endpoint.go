@@ -185,7 +185,7 @@ func LoadTargetEndpointsHCL(list *ast.ObjectList) ([]*TargetEndpoint, error) {
 		}
 
 		if htcList := listVal.Filter("http_target_connection"); len(htcList.Items) > 0 {
-			htc, err := loadTargetEndpointHTTPTargetConnectionHCL(htcList.Items[0])
+			htc, err := LoadHTTPTargetConnectionHCL(htcList.Items[0])
 			if err != nil {
 				errors = multierror.Append(errors, err)
 			} else {
@@ -260,7 +260,8 @@ func loadTargetEndpointScriptTargetEnvironmentVariablesHCL(item *ast.ObjectItem)
 	return newEnvs, nil
 }
 
-func loadTargetEndpointHTTPTargetConnectionHCL(item *ast.ObjectItem) (*HTTPTargetConnection, error) {
+// LoadHTTPTargetConnectionHCL converts an HCL ast.ObjectItem into an HTTPTargetConnection object.
+func LoadHTTPTargetConnectionHCL(item *ast.ObjectItem) (*HTTPTargetConnection, error) {
 	var htc HTTPTargetConnection
 
 	if err := hcl.DecodeObject(&htc, item.Val); err != nil {
