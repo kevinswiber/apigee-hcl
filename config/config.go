@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/hcl/hcl/ast"
+	"github.com/kevinswiber/apigee-hcl/config/endpoints"
 	"github.com/kevinswiber/apigee-hcl/config/hclerror"
 	"github.com/kevinswiber/apigee-hcl/config/policy"
 )
@@ -11,8 +12,8 @@ import (
 // Config is a container for holding the contents of an exported Apigee proxy bundle
 type Config struct {
 	Proxy           *Proxy
-	ProxyEndpoints  []*ProxyEndpoint
-	TargetEndpoints []*TargetEndpoint
+	ProxyEndpoints  []*endpoints.ProxyEndpoint
+	TargetEndpoints []*endpoints.TargetEndpoint
 	Policies        []interface{}
 	Resources       map[string]string
 }
@@ -34,7 +35,7 @@ func LoadConfigFromHCL(list *ast.ObjectList) (*Config, error) {
 	}
 
 	if proxyEndpoints := list.Filter("proxy_endpoint"); len(proxyEndpoints.Items) > 0 {
-		result, err := loadProxyEndpointsHCL(proxyEndpoints)
+		result, err := endpoints.LoadProxyEndpointsHCL(proxyEndpoints)
 		if err != nil {
 			errors = multierror.Append(errors, err)
 			return nil, errors
@@ -44,7 +45,7 @@ func LoadConfigFromHCL(list *ast.ObjectList) (*Config, error) {
 	}
 
 	if targetEndpoints := list.Filter("target_endpoint"); len(targetEndpoints.Items) > 0 {
-		result, err := loadTargetEndpointsHCL(targetEndpoints)
+		result, err := endpoints.LoadTargetEndpointsHCL(targetEndpoints)
 		if err != nil {
 			errors = multierror.Append(errors, err)
 			return nil, errors

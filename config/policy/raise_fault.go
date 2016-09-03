@@ -25,24 +25,24 @@ type faultResponse struct {
 }
 
 type raiseFaultCopy struct {
-	XMLName      string    `xml:"Copy" hcl:"-"`
-	Source       string    `xml:"source,attr,omitempty" hcl:"-"`
-	Headers      []*header `xml:"Headers>Header" hcl:"header"`
-	StatusCode   bool      `xml:",omitempty" hcl:"status_code"`
-	ReasonPhrase bool      `xml:",omitempty" hcl:"reason_phrase"`
+	XMLName      string     `xml:"Copy" hcl:"-"`
+	Source       string     `xml:"source,attr,omitempty" hcl:"-"`
+	Headers      *[]*header `xml:"Headers>Header" hcl:"header"`
+	StatusCode   bool       `xml:",omitempty" hcl:"status_code"`
+	ReasonPhrase bool       `xml:",omitempty" hcl:"reason_phrase"`
 }
 
 type raiseFaultRemove struct {
-	XMLName string    `xml:"Remove" hcl:"-"`
-	Headers []*header `xml:"Headers>Header" hcl:"header"`
+	XMLName string     `xml:"Remove" hcl:"-"`
+	Headers *[]*header `xml:"Headers>Header" hcl:"header"`
 }
 
 type raiseFaultSet struct {
-	XMLName      string    `xml:"Set" hcl:"-"`
-	Headers      []*header `xml:"Headers>Header" hcl:"header"`
-	Payload      *payload  `xml:",omitempty" hcl:"payload"`
-	StatusCode   int       `xml:",omitempty" hcl:"status_code"`
-	ReasonPhrase string    `xml:",omitempty" hcl:"reason_phrase"`
+	XMLName      string     `xml:"Set" hcl:"-"`
+	Headers      *[]*header `xml:"Headers>Header" hcl:"header"`
+	Payload      *payload   `xml:",omitempty" hcl:"payload"`
+	StatusCode   int        `xml:",omitempty" hcl:"status_code"`
+	ReasonPhrase string     `xml:",omitempty" hcl:"reason_phrase"`
 }
 
 // LoadRaiseFaultHCL converts an HCL ast.ObjectItem into a RaiseFaultPolicy.

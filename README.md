@@ -95,7 +95,7 @@ If you have Go v1.6+ installed, simply:
 - [x] JavaScript
 - [x] Extract Variables
 - [x] Raise Fault
-- [ ] Service Callout
+- [x] Service Callout
 - [ ] OAuth v2.0
 - [x] Verify API Key
 - [x] Response Cache

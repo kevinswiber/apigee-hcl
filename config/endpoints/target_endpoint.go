@@ -1,4 +1,4 @@
-package config
+package endpoints
 
 import (
 	"fmt"
@@ -105,7 +105,8 @@ type LoadBalancerServer struct {
 	IsFallback bool   `xml:",omitempty" hcl:"is_fallback"`
 }
 
-func loadTargetEndpointsHCL(list *ast.ObjectList) ([]*TargetEndpoint, error) {
+// LoadTargetEndpointsHCL converts an HCL ast.ObjectList into TargetEndpoint objects
+func LoadTargetEndpointsHCL(list *ast.ObjectList) ([]*TargetEndpoint, error) {
 	var errors *multierror.Error
 	var result []*TargetEndpoint
 	for _, item := range list.Items {
@@ -184,7 +185,7 @@ func loadTargetEndpointsHCL(list *ast.ObjectList) ([]*TargetEndpoint, error) {
 		}
 
 		if htcList := listVal.Filter("http_target_connection"); len(htcList.Items) > 0 {
-			htc, err := loadTargetEndpointHTTPTargetConnectionHCL(htcList.Items[0])
+			htc, err := LoadHTTPTargetConnectionHCL(htcList.Items[0])
 			if err != nil {
 				errors = multierror.Append(errors, err)
 			} else {
@@ -259,7 +260,8 @@ func loadTargetEndpointScriptTargetEnvironmentVariablesHCL(item *ast.ObjectItem)
 	return newEnvs, nil
 }
 
-func loadTargetEndpointHTTPTargetConnectionHCL(item *ast.ObjectItem) (*HTTPTargetConnection, error) {
+// LoadHTTPTargetConnectionHCL converts an HCL ast.ObjectItem into an HTTPTargetConnection object.
+func LoadHTTPTargetConnectionHCL(item *ast.ObjectItem) (*HTTPTargetConnection, error) {
 	var htc HTTPTargetConnection
 
 	if err := hcl.DecodeObject(&htc, item.Val); err != nil {
@@ -270,7 +272,7 @@ func loadTargetEndpointHTTPTargetConnectionHCL(item *ast.ObjectItem) (*HTTPTarge
 	if ot, ok := item.Val.(*ast.ObjectType); ok {
 		listVal = ot.List
 	} else {
-		return nil, fmt.Errorf("http proxy connection not an object")
+		return nil, fmt.Errorf("http target connection not an object")
 	}
 
 	if propsList := listVal.Filter("properties"); len(propsList.Items) > 0 {
