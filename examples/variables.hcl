@@ -196,5 +196,9 @@ policy assign_message "variables" {
     header "mock.firstName" {
       value = "{mock.firstName}"
     }
+
+    header "mock.lastName" {
+      value = "{mock.lastName}"
+    }
   }
 }
