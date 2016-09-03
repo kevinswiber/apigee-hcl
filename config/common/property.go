@@ -7,12 +7,14 @@ import (
 	"github.com/hashicorp/hcl/hcl/ast"
 )
 
+// Property represents the <Property/> element.
 type Property struct {
 	XMLName string      `xml:"Property"`
 	Name    string      `xml:"name,attr" hcl:",key"`
 	Value   interface{} `xml:",chardata" hcl:"-"`
 }
 
+// LoadPropertiesHCL converts an ast.ObjectItem into Property objects.
 func LoadPropertiesHCL(item *ast.ObjectItem) ([]*Property, error) {
 	var propsVal *ast.ObjectList
 	if ot, ok := item.Val.(*ast.ObjectType); ok {

@@ -12,7 +12,7 @@ import (
 //
 // Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#baseconfig
 type Proxy struct {
-	XMLName     string `xml:"APIProxy", hcl:"-"`
+	XMLName     string `xml:"APIProxy" hcl:"-"`
 	Name        string `xml:"name,attr,omitempty" hcl:"-"`
 	DisplayName string `xml:",omitempty" hcl:"display_name"`
 	Description string `xml:",omitempty" hcl:"description"`
