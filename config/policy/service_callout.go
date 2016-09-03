@@ -8,7 +8,7 @@ import (
 	"github.com/kevinswiber/apigee-hcl/config/endpoints"
 )
 
-// ServiceCalloutPolicy represents an <AssignMessage/> element.
+// ServiceCalloutPolicy represents an <ServiceCallout/> element.
 //
 // Documentation: http://docs.apigee.com/api-services/reference/service-callout-policy
 type ServiceCalloutPolicy struct {
@@ -33,7 +33,7 @@ type scRequest struct {
 	IgnoreUnresolvedVariables bool    `xml:",omitempty" hcl:"ignore_unresolved_variables"`
 }
 
-// LoadServiceCalloutHCL converts an HCL ast.ObjectItem into an AssignMessagePolicy object.
+// LoadServiceCalloutHCL converts an HCL ast.ObjectItem into an ServiceCalloutPolicy object.
 func LoadServiceCalloutHCL(item *ast.ObjectItem) (interface{}, error) {
 	var errors *multierror.Error
 	var p ServiceCalloutPolicy
