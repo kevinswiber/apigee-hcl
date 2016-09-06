@@ -1,11 +1,11 @@
-package config
+package dsl
 
 import (
 	"fmt"
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
-	"github.com/kevinswiber/apigee-hcl/config/hclerror"
+	"github.com/kevinswiber/apigee-hcl/dsl/hclerror"
 )
 
 // Proxy represents an <APIProxy/> element in an Apigee proxy bundle
@@ -18,7 +18,7 @@ type Proxy struct {
 	Description string `xml:",omitempty" hcl:"description"`
 }
 
-func loadProxyHCL(list *ast.ObjectList) (*Proxy, error) {
+func decodeProxyHCL(list *ast.ObjectList) (*Proxy, error) {
 	var errors *multierror.Error
 
 	var item = list.Items[0]

@@ -1,18 +1,19 @@
-package policy
+package quota
 
 import (
 	"fmt"
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
+	"github.com/kevinswiber/apigee-hcl/dsl/policies/policy"
 )
 
-// QuotaPolicy represents a <Quota/> element.
+// Quota represents a <Quota/> element.
 //
 // Documentation: http://docs.apigee.com/api-services/reference/quota-policy
-type QuotaPolicy struct {
+type Quota struct {
 	XMLName                   string `xml:"Quota" hcl:"-"`
-	Policy                    `hcl:",squash"`
+	policy.Policy             `hcl:",squash"`
 	Type                      string         `xml:"type,attr,omitempty" hcl:"type"`
 	DisplayName               string         `xml:",omitempty" hcl:"display_name"`
 	Allows                    []*allow       `xml:"Allow" hcl:"allow"`
@@ -73,12 +74,12 @@ type messageWeight struct {
 	Ref     string `xml:"ref,attr,omitempty" hcl:"ref"`
 }
 
-// LoadQuotaHCL converts an HCL ast.ObjectItem into a QuotaPolicy object.
-func LoadQuotaHCL(item *ast.ObjectItem) (interface{}, error) {
+// DecodeHCL converts an HCL ast.ObjectItem into a Quota object.
+func DecodeHCL(item *ast.ObjectItem) (interface{}, error) {
 	var errors *multierror.Error
-	var p QuotaPolicy
+	var p Quota
 
-	if err := LoadCommonPolicyHCL(item, &p.Policy); err != nil {
+	if err := policy.DecodeHCL(item, &p.Policy); err != nil {
 		errors = multierror.Append(errors, err)
 		return nil, errors
 	}
@@ -97,7 +98,7 @@ func LoadQuotaHCL(item *ast.ObjectItem) (interface{}, error) {
 	}
 
 	if allowList := listVal.Filter("allow"); len(allowList.Items) > 0 {
-		a, err := loadQuotaAllowsHCL(allowList.Items)
+		a, err := decodeQuotaAllowsHCL(allowList.Items)
 		if err != nil {
 			errors = multierror.Append(errors, err)
 		} else {
@@ -109,10 +110,10 @@ func LoadQuotaHCL(item *ast.ObjectItem) (interface{}, error) {
 		return nil, errors
 	}
 
-	return p, nil
+	return &p, nil
 }
 
-func loadQuotaAllowsHCL(items []*ast.ObjectItem) ([]*allow, error) {
+func decodeQuotaAllowsHCL(items []*ast.ObjectItem) ([]*allow, error) {
 	var result []*allow
 
 	for _, item := range items {
@@ -129,7 +130,7 @@ func loadQuotaAllowsHCL(items []*ast.ObjectItem) ([]*allow, error) {
 		}
 
 		if cs := listVal.Filter("class"); len(cs.Items) > 0 {
-			classes, err := loadQuotaAllowClassHCL(cs.Items)
+			classes, err := decodeQuotaAllowClassHCL(cs.Items)
 			if err != nil {
 				return nil, err
 			}
@@ -141,7 +142,7 @@ func loadQuotaAllowsHCL(items []*ast.ObjectItem) ([]*allow, error) {
 	return result, nil
 }
 
-func loadQuotaAllowClassHCL(items []*ast.ObjectItem) ([]*class, error) {
+func decodeQuotaAllowClassHCL(items []*ast.ObjectItem) ([]*class, error) {
 	var result []*class
 
 	for _, item := range items {
@@ -159,7 +160,7 @@ func loadQuotaAllowClassHCL(items []*ast.ObjectItem) ([]*class, error) {
 
 		if as := listVal.Filter("allow"); len(as.Items) > 0 {
 
-			classAllows, err := loadQuotaAllowClassAllowsHCL(as.Items)
+			classAllows, err := decodeQuotaAllowClassAllowsHCL(as.Items)
 			if err != nil {
 				return nil, err
 			}
@@ -173,7 +174,7 @@ func loadQuotaAllowClassHCL(items []*ast.ObjectItem) ([]*class, error) {
 	return result, nil
 }
 
-func loadQuotaAllowClassAllowsHCL(items []*ast.ObjectItem) ([]*classAllow, error) {
+func decodeQuotaAllowClassAllowsHCL(items []*ast.ObjectItem) ([]*classAllow, error) {
 	var result []*classAllow
 
 	for _, item := range items {

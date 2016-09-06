@@ -1,19 +1,21 @@
-package policy
+package servicecallout
 
 import (
 	"fmt"
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
-	"github.com/kevinswiber/apigee-hcl/config/endpoints"
+	"github.com/kevinswiber/apigee-hcl/dsl/endpoints"
+	"github.com/kevinswiber/apigee-hcl/dsl/policies/assignmessage"
+	"github.com/kevinswiber/apigee-hcl/dsl/policies/policy"
 )
 
-// ServiceCalloutPolicy represents an <ServiceCallout/> element.
+// ServiceCallout represents an <ServiceCallout/> element.
 //
 // Documentation: http://docs.apigee.com/api-services/reference/service-callout-policy
-type ServiceCalloutPolicy struct {
+type ServiceCallout struct {
 	XMLName               string `xml:"ServiceCallout" hcl:"-"`
-	Policy                `hcl:",squash"`
+	policy.Policy         `hcl:",squash"`
 	DisplayName           string                           `xml:",omitempty" hcl:"display_name"`
 	Request               *scRequest                       `hcl:"request"`
 	HTTPTargetConnection  *endpoints.HTTPTargetConnection  `hcl:"http_target_connection"`
@@ -23,22 +25,22 @@ type ServiceCalloutPolicy struct {
 }
 
 type scRequest struct {
-	XMLName                   string  `xml:"Request" hcl:"-"`
-	ClearPayload              bool    `xml:"clearPayload,attr,omitempty" hcl:"clear_payload"`
-	Variable                  string  `xml:"variable,attr,omitempty" hcl:"variable"`
-	Add                       *add    `xml:",omitempty" hcl:"add"`
-	Copy                      *copy   `xml:",omitempty" hcl:"copy"`
-	Remove                    *remove `xml:",omitempty" hcl:"remove"`
-	Set                       *set    `xml:",omitempty" hcl:"set"`
-	IgnoreUnresolvedVariables bool    `xml:",omitempty" hcl:"ignore_unresolved_variables"`
+	XMLName                   string                `xml:"Request" hcl:"-"`
+	ClearPayload              bool                  `xml:"clearPayload,attr,omitempty" hcl:"clear_payload"`
+	Variable                  string                `xml:"variable,attr,omitempty" hcl:"variable"`
+	Add                       *assignmessage.Add    `xml:",omitempty" hcl:"add"`
+	Copy                      *assignmessage.Copy   `xml:",omitempty" hcl:"copy"`
+	Remove                    *assignmessage.Remove `xml:",omitempty" hcl:"remove"`
+	Set                       *assignmessage.Set    `xml:",omitempty" hcl:"set"`
+	IgnoreUnresolvedVariables bool                  `xml:",omitempty" hcl:"ignore_unresolved_variables"`
 }
 
-// LoadServiceCalloutHCL converts an HCL ast.ObjectItem into an ServiceCalloutPolicy object.
-func LoadServiceCalloutHCL(item *ast.ObjectItem) (interface{}, error) {
+// DecodeHCL converts an HCL ast.ObjectItem into an ServiceCallout object.
+func DecodeHCL(item *ast.ObjectItem) (interface{}, error) {
 	var errors *multierror.Error
-	var p ServiceCalloutPolicy
+	var p ServiceCallout
 
-	if err := LoadCommonPolicyHCL(item, &p.Policy); err != nil {
+	if err := policy.DecodeHCL(item, &p.Policy); err != nil {
 		errors = multierror.Append(errors, err)
 		return nil, errors
 	}
@@ -58,7 +60,7 @@ func LoadServiceCalloutHCL(item *ast.ObjectItem) (interface{}, error) {
 
 	if requestList := listVal.Filter("request"); len(requestList.Items) > 0 {
 		item := requestList.Items[0]
-		r, err := loadServiceCalloutRequestHCL(item)
+		r, err := decodeRequestHCL(item)
 		if err != nil {
 			errors = multierror.Append(errors, err)
 		} else {
@@ -69,7 +71,7 @@ func LoadServiceCalloutHCL(item *ast.ObjectItem) (interface{}, error) {
 	}
 
 	if htcList := listVal.Filter("http_target_connection"); len(htcList.Items) > 0 {
-		htc, err := endpoints.LoadHTTPTargetConnectionHCL(htcList.Items[0])
+		htc, err := endpoints.DecodeHTTPTargetConnectionHCL(htcList.Items[0])
 		if err != nil {
 			errors = multierror.Append(errors, err)
 		} else {
@@ -81,10 +83,10 @@ func LoadServiceCalloutHCL(item *ast.ObjectItem) (interface{}, error) {
 		return nil, errors
 	}
 
-	return p, nil
+	return &p, nil
 }
 
-func loadServiceCalloutRequestHCL(item *ast.ObjectItem) (*scRequest, error) {
+func decodeRequestHCL(item *ast.ObjectItem) (*scRequest, error) {
 	var r scRequest
 	var errors *multierror.Error
 	var listVal *ast.ObjectList
@@ -103,7 +105,7 @@ func loadServiceCalloutRequestHCL(item *ast.ObjectItem) (*scRequest, error) {
 
 	if addList := listVal.Filter("add"); len(addList.Items) > 0 {
 		item := addList.Items[0]
-		a, err := loadAssignMessageAddHCL(item)
+		a, err := assignmessage.DecodeAddHCL(item)
 		if err != nil {
 			errors = multierror.Append(errors, err)
 		} else {
@@ -115,7 +117,7 @@ func loadServiceCalloutRequestHCL(item *ast.ObjectItem) (*scRequest, error) {
 
 	if copyList := listVal.Filter("copy"); len(copyList.Items) > 0 {
 		item := copyList.Items[0]
-		a, err := loadAssignMessageCopyHCL(item)
+		a, err := assignmessage.DecodeCopyHCL(item)
 		if err != nil {
 			errors = multierror.Append(errors, err)
 		} else {
@@ -127,7 +129,7 @@ func loadServiceCalloutRequestHCL(item *ast.ObjectItem) (*scRequest, error) {
 
 	if removeList := listVal.Filter("remove"); len(removeList.Items) > 0 {
 		item := removeList.Items[0]
-		a, err := loadAssignMessageRemoveHCL(item)
+		a, err := assignmessage.DecodeRemoveHCL(item)
 		if err != nil {
 			errors = multierror.Append(errors, err)
 		} else {
@@ -139,7 +141,7 @@ func loadServiceCalloutRequestHCL(item *ast.ObjectItem) (*scRequest, error) {
 
 	if setList := listVal.Filter("set"); len(setList.Items) > 0 {
 		item := setList.Items[0]
-		a, err := loadAssignMessageSetHCL(item)
+		a, err := assignmessage.DecodeSetHCL(item)
 		if err != nil {
 			errors = multierror.Append(errors, err)
 		} else {

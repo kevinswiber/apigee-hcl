@@ -1,16 +1,17 @@
-package policy
+package responsecache
 
 import (
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
+	"github.com/kevinswiber/apigee-hcl/dsl/policies/policy"
 )
 
-// ResponseCachePolicy represents a <ResponseCache/> element.
+// ResponseCache represents a <ResponseCache/> element.
 //
 // Documentation: http://docs.apigee.com/api-services/reference/response-cache-policy
-type ResponseCachePolicy struct {
+type ResponseCache struct {
 	XMLName                     string `xml:"ResponseCache" hcl:"-"`
-	Policy                      `hcl:",squash"`
+	policy.Policy               `hcl:",squash"`
 	Type                        string          `xml:"type,attr,omitempty" hcl:"type"`
 	DisplayName                 string          `xml:",omitempty" hcl:"display_name"`
 	CacheKey                    *cacheKey       `xml:"CacheKey" hcl:"cache_key"`
@@ -62,11 +63,11 @@ type expiryDate struct {
 	Value   string `xml:",chardata" hcl:"value"`
 }
 
-// LoadResponseCacheHCL converts an HCL ast.ObjectItem into a ResponseCachePolicy
-func LoadResponseCacheHCL(item *ast.ObjectItem) (interface{}, error) {
-	var p ResponseCachePolicy
+// DecodeHCL converts an HCL ast.ObjectItem into a ResponseCache
+func DecodeHCL(item *ast.ObjectItem) (interface{}, error) {
+	var p ResponseCache
 
-	if err := LoadCommonPolicyHCL(item, &p.Policy); err != nil {
+	if err := policy.DecodeHCL(item, &p.Policy); err != nil {
 		return nil, err
 	}
 
@@ -74,5 +75,5 @@ func LoadResponseCacheHCL(item *ast.ObjectItem) (interface{}, error) {
 		return nil, err
 	}
 
-	return p, nil
+	return &p, nil
 }

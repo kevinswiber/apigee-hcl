@@ -1,16 +1,17 @@
-package policy
+package spikearrest
 
 import (
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
+	"github.com/kevinswiber/apigee-hcl/dsl/policies/policy"
 )
 
-// SpikeArrestPolicy represents a <SpikeArrest/> element.
+// SpikeArrest represents a <SpikeArrest/> element.
 //
 // Documentation: http://docs.apigee.com/api-services/reference/spike-arrest-policy
-type SpikeArrestPolicy struct {
+type SpikeArrest struct {
 	XMLName       string `xml:"SpikeArrest" hcl:"-"`
-	Policy        `hcl:",squash"`
+	policy.Policy `hcl:",squash"`
 	DisplayName   string              `xml:",omitempty" hcl:"display_name"`
 	Identifier    *spikeIdentifier    `hcl:"identifier"`
 	MessageWeight *spikeMessageWeight `hcl:"message_weight"`
@@ -33,11 +34,11 @@ type spikeRate struct {
 	Value   string `xml:",chardata" hcl:"value"`
 }
 
-// LoadSpikeArrestHCL converts an HCL ast.ObjectItem into a SpikeArrestPolicy object.
-func LoadSpikeArrestHCL(item *ast.ObjectItem) (interface{}, error) {
-	var p SpikeArrestPolicy
+// DecodeHCL converts an HCL ast.ObjectItem into a SpikeArrest object.
+func DecodeHCL(item *ast.ObjectItem) (interface{}, error) {
+	var p SpikeArrest
 
-	if err := LoadCommonPolicyHCL(item, &p.Policy); err != nil {
+	if err := policy.DecodeHCL(item, &p.Policy); err != nil {
 		return nil, err
 	}
 
@@ -45,5 +46,5 @@ func LoadSpikeArrestHCL(item *ast.ObjectItem) (interface{}, error) {
 		return nil, err
 	}
 
-	return p, nil
+	return &p, nil
 }

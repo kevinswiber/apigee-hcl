@@ -1,4 +1,4 @@
-package policy
+package assignmessage
 
 import (
 	"fmt"
@@ -6,19 +6,21 @@ import (
 	"github.com/hashicorp/hcl/hcl/ast"
 )
 
-type add struct {
+// Add includes elements to add to an HTTP message
+type Add struct {
 	XMLName     string         `xml:"Add" hcl:"-"`
-	Headers     *[]*header     `xml:"Headers>Header" hcl:"header"`
-	QueryParams *[]*queryParam `xml:"QueryParams>QueryParam" hcl:"query_param"`
-	FormParams  *[]*formParam  `xml:"FormParams>FormParam" hcl:"form_param"`
+	Headers     *[]*Header     `xml:"Headers>Header" hcl:"header"`
+	QueryParams *[]*QueryParam `xml:"QueryParams>QueryParam" hcl:"query_param"`
+	FormParams  *[]*FormParam  `xml:"FormParams>FormParam" hcl:"form_param"`
 }
 
-type copy struct {
+// Copy includes elements to copy to an HTTP message
+type Copy struct {
 	XMLName      string         `xml:"Copy" hcl:"-"`
 	Source       string         `xml:"source,attr,omitempty" hcl:"-"`
-	Headers      *[]*header     `xml:"Headers>Header" hcl:"header"`
-	QueryParams  *[]*queryParam `xml:"QueryParams>QueryParam" hcl:"query_param"`
-	FormParams   *[]*formParam  `xml:"FormParams>FormParam" hcl:"form_param"`
+	Headers      *[]*Header     `xml:"Headers>Header" hcl:"header"`
+	QueryParams  *[]*QueryParam `xml:"QueryParams>QueryParam" hcl:"query_param"`
+	FormParams   *[]*FormParam  `xml:"FormParams>FormParam" hcl:"form_param"`
 	Payload      bool           `xml:",omitempty" hcl:"payload"`
 	Version      bool           `xml:",omitempty" hcl:"version"`
 	Verb         bool           `xml:",omitempty" hcl:"verb"`
@@ -27,20 +29,22 @@ type copy struct {
 	ReasonPhrase bool           `xml:",omitempty" hcl:"reason_phrase"`
 }
 
-type remove struct {
+// Remove includes elements to remove from an HTTP message
+type Remove struct {
 	XMLName     string         `xml:"Remove" hcl:"-"`
-	Headers     *[]*header     `xml:"Headers>Header" hcl:"header"`
-	QueryParams *[]*queryParam `xml:"QueryParams>QueryParam" hcl:"query_param"`
-	FormParams  *[]*formParam  `xml:"FormParams>FormParam" hcl:"form_param"`
+	Headers     *[]*Header     `xml:"Headers>Header" hcl:"header"`
+	QueryParams *[]*QueryParam `xml:"QueryParams>QueryParam" hcl:"query_param"`
+	FormParams  *[]*FormParam  `xml:"FormParams>FormParam" hcl:"form_param"`
 	Payload     bool           `xml:",omitempty" hcl:"payload"`
 }
 
-type set struct {
+// Set includes elements to set on an HTTP message
+type Set struct {
 	XMLName      string         `xml:"Set" hcl:"-"`
-	Headers      *[]*header     `xml:"Headers>Header" hcl:"header"`
-	QueryParams  *[]*queryParam `xml:"QueryParams>QueryParam" hcl:"query_param"`
-	FormParams   *[]*formParam  `xml:"FormParams>FormParam" hcl:"form_param"`
-	Payload      *payload       `xml:",omitempty" hcl:"payload"`
+	Headers      *[]*Header     `xml:"Headers>Header" hcl:"header"`
+	QueryParams  *[]*QueryParam `xml:"QueryParams>QueryParam" hcl:"query_param"`
+	FormParams   *[]*FormParam  `xml:"FormParams>FormParam" hcl:"form_param"`
+	Payload      *Payload       `xml:",omitempty" hcl:"payload"`
 	Version      string         `xml:",omitempty" hcl:"version"`
 	Verb         string         `xml:",omitempty" hcl:"verb"`
 	Path         string         `xml:",omitempty" hcl:"path"`
@@ -48,7 +52,8 @@ type set struct {
 	ReasonPhrase string         `xml:",omitempty" hcl:"reason_phrase"`
 }
 
-type payload struct {
+// Payload includes content to include an HTTP message body.
+type Payload struct {
 	XMLName        string `xml:"Payload" hcl:"-"`
 	ContentType    string `xml:"contentType,attr,omitempty" hcl:"content_type"`
 	VariablePrefix string `xml:"variablePrefix,attr,omitempty" hcl:"variable_prefix"`
@@ -56,26 +61,30 @@ type payload struct {
 	Value          string `xml:",chardata" hcl:"value"`
 }
 
-type header struct {
+// Header represents an HTTP header
+type Header struct {
 	XMLName string `xml:"Header" hcl:"-"`
 	Name    string `xml:"name,attr" hcl:"-"`
 	Value   string `xml:",chardata" hcl:"value"`
 }
 
-type queryParam struct {
+// QueryParam represents a URL query parameter.
+type QueryParam struct {
 	XMLName string `xml:"QueryParam" hcl:"-"`
 	Name    string `xml:"name,attr" hcl:"-"`
 	Value   string `xml:",chardata" hcl:"value"`
 }
 
-type formParam struct {
+// FormParam represents an HTTP message form parameter.
+type FormParam struct {
 	XMLName string `xml:"FormParam" hcl:"-"`
 	Name    string `xml:"name,attr" hcl:"-"`
 	Value   string `xml:",chardata" hcl:"value"`
 }
 
-func loadAssignMessageAddHCL(item *ast.ObjectItem) (*add, error) {
-	result := new(add)
+// DecodeAddHCL converts HCL into an Add struct.
+func DecodeAddHCL(item *ast.ObjectItem) (*Add, error) {
+	result := new(Add)
 
 	var listVal *ast.ObjectList
 	if ot, ok := item.Val.(*ast.ObjectType); ok {
@@ -84,21 +93,21 @@ func loadAssignMessageAddHCL(item *ast.ObjectItem) (*add, error) {
 		return nil, fmt.Errorf("add not an object")
 	}
 
-	headers, err := loadHeadersHCL(listVal)
+	headers, err := DecodeHeadersHCL(listVal)
 	if err != nil {
 		return nil, err
 	}
 
 	result.Headers = headers
 
-	qparams, err := loadQueryParamsHCL(listVal)
+	qparams, err := DecodeQueryParamsHCL(listVal)
 	if err != nil {
 		return nil, err
 	}
 
 	result.QueryParams = qparams
 
-	fparams, err := loadFormParamsHCL(listVal)
+	fparams, err := DecodeFormParamsHCL(listVal)
 	if err != nil {
 		return nil, err
 	}
@@ -107,8 +116,9 @@ func loadAssignMessageAddHCL(item *ast.ObjectItem) (*add, error) {
 	return result, nil
 }
 
-func loadAssignMessageCopyHCL(item *ast.ObjectItem) (*copy, error) {
-	var result copy
+// DecodeCopyHCL converts HCL into a Copy struct.
+func DecodeCopyHCL(item *ast.ObjectItem) (*Copy, error) {
+	var result Copy
 	if err := hcl.DecodeObject(&result, item.Val.(*ast.ObjectType)); err != nil {
 		return nil, err
 	}
@@ -120,21 +130,21 @@ func loadAssignMessageCopyHCL(item *ast.ObjectItem) (*copy, error) {
 		return nil, fmt.Errorf("copy not an object")
 	}
 
-	headers, err := loadHeadersHCL(listVal)
+	headers, err := DecodeHeadersHCL(listVal)
 	if err != nil {
 		return nil, err
 	}
 
 	result.Headers = headers
 
-	qparams, err := loadQueryParamsHCL(listVal)
+	qparams, err := DecodeQueryParamsHCL(listVal)
 	if err != nil {
 		return nil, err
 	}
 
 	result.QueryParams = qparams
 
-	fparams, err := loadFormParamsHCL(listVal)
+	fparams, err := DecodeFormParamsHCL(listVal)
 	if err != nil {
 		return nil, err
 	}
@@ -143,8 +153,9 @@ func loadAssignMessageCopyHCL(item *ast.ObjectItem) (*copy, error) {
 	return &result, nil
 }
 
-func loadAssignMessageRemoveHCL(item *ast.ObjectItem) (*remove, error) {
-	var result remove
+// DecodeRemoveHCL converts HCL into a Remove struct
+func DecodeRemoveHCL(item *ast.ObjectItem) (*Remove, error) {
+	var result Remove
 	if err := hcl.DecodeObject(&result, item.Val.(*ast.ObjectType)); err != nil {
 		return nil, err
 	}
@@ -156,21 +167,21 @@ func loadAssignMessageRemoveHCL(item *ast.ObjectItem) (*remove, error) {
 		return nil, fmt.Errorf("remove not an object")
 	}
 
-	headers, err := loadHeadersHCL(listVal)
+	headers, err := DecodeHeadersHCL(listVal)
 	if err != nil {
 		return nil, err
 	}
 
 	result.Headers = headers
 
-	qparams, err := loadQueryParamsHCL(listVal)
+	qparams, err := DecodeQueryParamsHCL(listVal)
 	if err != nil {
 		return nil, err
 	}
 
 	result.QueryParams = qparams
 
-	fparams, err := loadFormParamsHCL(listVal)
+	fparams, err := DecodeFormParamsHCL(listVal)
 	if err != nil {
 		return nil, err
 	}
@@ -179,8 +190,9 @@ func loadAssignMessageRemoveHCL(item *ast.ObjectItem) (*remove, error) {
 	return &result, nil
 }
 
-func loadAssignMessageSetHCL(item *ast.ObjectItem) (*set, error) {
-	var result set
+// DecodeSetHCL converts HCL into a Set struct.
+func DecodeSetHCL(item *ast.ObjectItem) (*Set, error) {
+	var result Set
 	if err := hcl.DecodeObject(&result, item.Val.(*ast.ObjectType)); err != nil {
 		return nil, err
 	}
@@ -192,21 +204,21 @@ func loadAssignMessageSetHCL(item *ast.ObjectItem) (*set, error) {
 		return nil, fmt.Errorf("set not an object")
 	}
 
-	headers, err := loadHeadersHCL(listVal)
+	headers, err := DecodeHeadersHCL(listVal)
 	if err != nil {
 		return nil, err
 	}
 
 	result.Headers = headers
 
-	qparams, err := loadQueryParamsHCL(listVal)
+	qparams, err := DecodeQueryParamsHCL(listVal)
 	if err != nil {
 		return nil, err
 	}
 
 	result.QueryParams = qparams
 
-	fparams, err := loadFormParamsHCL(listVal)
+	fparams, err := DecodeFormParamsHCL(listVal)
 	if err != nil {
 		return nil, err
 	}
@@ -215,11 +227,12 @@ func loadAssignMessageSetHCL(item *ast.ObjectItem) (*set, error) {
 	return &result, nil
 }
 
-func loadHeadersHCL(listVal *ast.ObjectList) (*[]*header, error) {
-	var headers []*header
+// DecodeHeadersHCL converts HCL headers into a Header array.
+func DecodeHeadersHCL(listVal *ast.ObjectList) (*[]*Header, error) {
+	var headers []*Header
 	if headerList := listVal.Filter("header"); len(headerList.Items) > 0 {
 		for _, h := range headerList.Items {
-			var hdr header
+			var hdr Header
 			if err := hcl.DecodeObject(&hdr, h.Val.(*ast.ObjectType)); err != nil {
 				return nil, err
 			}
@@ -234,11 +247,12 @@ func loadHeadersHCL(listVal *ast.ObjectList) (*[]*header, error) {
 	return &headers, nil
 }
 
-func loadQueryParamsHCL(listVal *ast.ObjectList) (*[]*queryParam, error) {
-	var qparams []*queryParam
+// DecodeQueryParamsHCL converts HCL into a QueryParam array.
+func DecodeQueryParamsHCL(listVal *ast.ObjectList) (*[]*QueryParam, error) {
+	var qparams []*QueryParam
 	if qparamList := listVal.Filter("query_param"); len(qparamList.Items) > 0 {
 		for _, q := range qparamList.Items {
-			var qparam queryParam
+			var qparam QueryParam
 			if err := hcl.DecodeObject(&qparam, q.Val.(*ast.ObjectType)); err != nil {
 				return nil, err
 			}
@@ -253,11 +267,12 @@ func loadQueryParamsHCL(listVal *ast.ObjectList) (*[]*queryParam, error) {
 	return &qparams, nil
 }
 
-func loadFormParamsHCL(listVal *ast.ObjectList) (*[]*formParam, error) {
-	var fparams []*formParam
+// DecodeFormParamsHCL converts HCL into a FormParams array.
+func DecodeFormParamsHCL(listVal *ast.ObjectList) (*[]*FormParam, error) {
+	var fparams []*FormParam
 	if fparamList := listVal.Filter("form_param"); len(fparamList.Items) > 0 {
 		for _, f := range fparamList.Items {
-			var fparam formParam
+			var fparam FormParam
 			if err := hcl.DecodeObject(&fparam, f.Val.(*ast.ObjectType)); err != nil {
 				return nil, err
 			}

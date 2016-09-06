@@ -101,7 +101,7 @@ type FlowResponse struct {
 	Steps   []*FlowStep `xml:",innerxml" hcl:"step"`
 }
 
-func loadPreFlowHCL(list *ast.ObjectList) (*PreFlow, error) {
+func decodePreFlowHCL(list *ast.ObjectList) (*PreFlow, error) {
 	var result PreFlow
 	item := list.Items[0]
 
@@ -115,7 +115,7 @@ func loadPreFlowHCL(list *ast.ObjectList) (*PreFlow, error) {
 	if request := listVal.Filter("request"); len(request.Items) > 0 {
 		item := request.Items[0]
 
-		steps, err := loadFlowStepsHCL(item)
+		steps, err := decodeFlowStepsHCL(item)
 		if err != nil {
 			return nil, err
 		}
@@ -126,7 +126,7 @@ func loadPreFlowHCL(list *ast.ObjectList) (*PreFlow, error) {
 	if response := listVal.Filter("response"); len(response.Items) > 0 {
 		item := response.Items[0]
 
-		steps, err := loadFlowStepsHCL(item)
+		steps, err := decodeFlowStepsHCL(item)
 		if err != nil {
 			return nil, err
 		}
@@ -137,7 +137,7 @@ func loadPreFlowHCL(list *ast.ObjectList) (*PreFlow, error) {
 	return &result, nil
 }
 
-func loadFlowsHCL(list *ast.ObjectList) ([]*Flow, error) {
+func decodeFlowsHCL(list *ast.ObjectList) ([]*Flow, error) {
 	var result []*Flow
 
 	for _, item := range list.Items {
@@ -152,7 +152,7 @@ func loadFlowsHCL(list *ast.ObjectList) ([]*Flow, error) {
 		if request := listVal.Filter("request"); len(request.Items) > 0 {
 			item := request.Items[0]
 
-			steps, err := loadFlowStepsHCL(item)
+			steps, err := decodeFlowStepsHCL(item)
 			if err != nil {
 				return nil, err
 			}
@@ -163,7 +163,7 @@ func loadFlowsHCL(list *ast.ObjectList) ([]*Flow, error) {
 		if response := listVal.Filter("response"); len(response.Items) > 0 {
 			item := response.Items[0]
 
-			steps, err := loadFlowStepsHCL(item)
+			steps, err := decodeFlowStepsHCL(item)
 			if err != nil {
 				return nil, err
 			}
@@ -178,7 +178,7 @@ func loadFlowsHCL(list *ast.ObjectList) ([]*Flow, error) {
 	return result, nil
 }
 
-func loadPostFlowHCL(list *ast.ObjectList) (*PostFlow, error) {
+func decodePostFlowHCL(list *ast.ObjectList) (*PostFlow, error) {
 	var result PostFlow
 	item := list.Items[0]
 
@@ -192,7 +192,7 @@ func loadPostFlowHCL(list *ast.ObjectList) (*PostFlow, error) {
 	if request := listVal.Filter("request"); len(request.Items) > 0 {
 		item := request.Items[0]
 
-		steps, err := loadFlowStepsHCL(item)
+		steps, err := decodeFlowStepsHCL(item)
 		if err != nil {
 			return nil, err
 		}
@@ -203,7 +203,7 @@ func loadPostFlowHCL(list *ast.ObjectList) (*PostFlow, error) {
 	if response := listVal.Filter("response"); len(response.Items) > 0 {
 		item := response.Items[0]
 
-		steps, err := loadFlowStepsHCL(item)
+		steps, err := decodeFlowStepsHCL(item)
 		if err != nil {
 			return nil, err
 		}
@@ -214,7 +214,7 @@ func loadPostFlowHCL(list *ast.ObjectList) (*PostFlow, error) {
 	return &result, nil
 }
 
-func loadPostClientFlowHCL(list *ast.ObjectList) (*PostClientFlow, error) {
+func decodePostClientFlowHCL(list *ast.ObjectList) (*PostClientFlow, error) {
 	var result PostClientFlow
 	item := list.Items[0]
 
@@ -228,7 +228,7 @@ func loadPostClientFlowHCL(list *ast.ObjectList) (*PostClientFlow, error) {
 	if request := listVal.Filter("request"); len(request.Items) > 0 {
 		item := request.Items[0]
 
-		steps, err := loadFlowStepsHCL(item)
+		steps, err := decodeFlowStepsHCL(item)
 		if err != nil {
 			return nil, err
 		}
@@ -239,7 +239,7 @@ func loadPostClientFlowHCL(list *ast.ObjectList) (*PostClientFlow, error) {
 	if response := listVal.Filter("response"); len(response.Items) > 0 {
 		item := response.Items[0]
 
-		steps, err := loadFlowStepsHCL(item)
+		steps, err := decodeFlowStepsHCL(item)
 		if err != nil {
 			return nil, err
 		}
@@ -250,13 +250,13 @@ func loadPostClientFlowHCL(list *ast.ObjectList) (*PostClientFlow, error) {
 	return &result, nil
 }
 
-func loadFaultRulesHCL(list *ast.ObjectList) ([]*FaultRule, error) {
+func decodeFaultRulesHCL(list *ast.ObjectList) ([]*FaultRule, error) {
 	var result []*FaultRule
 
 	for _, item := range list.Items {
 		var faultRule FaultRule
 
-		steps, err := loadFlowStepsHCL(item)
+		steps, err := decodeFlowStepsHCL(item)
 		if err != nil {
 			return nil, err
 		}
@@ -270,14 +270,14 @@ func loadFaultRulesHCL(list *ast.ObjectList) ([]*FaultRule, error) {
 	return result, nil
 }
 
-func loadDefaultFaultRuleHCL(item *ast.ObjectItem) (*DefaultFaultRule, error) {
+func decodeDefaultFaultRuleHCL(item *ast.ObjectItem) (*DefaultFaultRule, error) {
 	var faultRule DefaultFaultRule
 
 	if err := hcl.DecodeObject(&faultRule, item.Val); err != nil {
 		return nil, fmt.Errorf("error decoding step object")
 	}
 
-	steps, err := loadFlowStepsHCL(item)
+	steps, err := decodeFlowStepsHCL(item)
 	if err != nil {
 		return nil, err
 	}
@@ -288,7 +288,8 @@ func loadDefaultFaultRuleHCL(item *ast.ObjectItem) (*DefaultFaultRule, error) {
 
 	return &faultRule, nil
 }
-func loadFlowStepsHCL(list *ast.ObjectItem) ([]*FlowStep, error) {
+
+func decodeFlowStepsHCL(list *ast.ObjectItem) ([]*FlowStep, error) {
 	var listVal *ast.ObjectList
 	if ot, ok := list.Val.(*ast.ObjectType); ok {
 		listVal = ot.List

@@ -1,23 +1,24 @@
-package policy
+package assignmessage
 
 import (
 	"fmt"
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
+	"github.com/kevinswiber/apigee-hcl/dsl/policies/policy"
 )
 
-// AssignMessagePolicy represents an <AssignMessage/> element.
+// AssignMessage represents an <AssignMessage/> element.
 //
 // Documentation: http://docs.apigee.com/api-services/reference/assign-message-policy
-type AssignMessagePolicy struct {
+type AssignMessage struct {
 	XMLName                   string `xml:"AssignMessage" hcl:"-"`
-	Policy                    `hcl:",squash"`
+	policy.Policy             `hcl:",squash"`
 	DisplayName               string          `xml:",omitempty" hcl:"display_name"`
-	Add                       *add            `xml:",omitempty" hcl:"add"`
-	Copy                      *copy           `xml:",omitempty" hcl:"copy"`
-	Remove                    *remove         `xml:",omitempty" hcl:"remove"`
-	Set                       *set            `xml:",omitempty" hcl:"set"`
+	Add                       *Add            `xml:",omitempty" hcl:"add"`
+	Copy                      *Copy           `xml:",omitempty" hcl:"copy"`
+	Remove                    *Remove         `xml:",omitempty" hcl:"remove"`
+	Set                       *Set            `xml:",omitempty" hcl:"set"`
 	AssignVariable            *assignVariable `xml:",omitempty" hcl:"assign_variable"`
 	AssignTo                  *assignTo       `xml:",omitempty" hcl:"assign_to"`
 	IgnoreUnresolvedVariables bool            `xml:",omitempty" hcl:"ignore_unresolved_variables"`
@@ -36,12 +37,12 @@ type assignTo struct {
 	Value     string `xml:",chardata" hcl:"value"`
 }
 
-// LoadAssignMessageHCL converts an HCL ast.ObjectItem into an AssignMessagePolicy object.
-func LoadAssignMessageHCL(item *ast.ObjectItem) (interface{}, error) {
+// DecodeHCL converts an HCL ast.ObjectItem into an AssignMessage object.
+func DecodeHCL(item *ast.ObjectItem) (interface{}, error) {
 	var errors *multierror.Error
-	var p AssignMessagePolicy
+	var p AssignMessage
 
-	if err := LoadCommonPolicyHCL(item, &p.Policy); err != nil {
+	if err := policy.DecodeHCL(item, &p.Policy); err != nil {
 		errors = multierror.Append(errors, err)
 		return nil, errors
 	}
@@ -61,7 +62,7 @@ func LoadAssignMessageHCL(item *ast.ObjectItem) (interface{}, error) {
 
 	if addList := listVal.Filter("add"); len(addList.Items) > 0 {
 		item := addList.Items[0]
-		a, err := loadAssignMessageAddHCL(item)
+		a, err := DecodeAddHCL(item)
 		if err != nil {
 			errors = multierror.Append(errors, err)
 		} else {
@@ -73,7 +74,7 @@ func LoadAssignMessageHCL(item *ast.ObjectItem) (interface{}, error) {
 
 	if copyList := listVal.Filter("copy"); len(copyList.Items) > 0 {
 		item := copyList.Items[0]
-		a, err := loadAssignMessageCopyHCL(item)
+		a, err := DecodeCopyHCL(item)
 		if err != nil {
 			errors = multierror.Append(errors, err)
 		} else {
@@ -85,7 +86,7 @@ func LoadAssignMessageHCL(item *ast.ObjectItem) (interface{}, error) {
 
 	if removeList := listVal.Filter("remove"); len(removeList.Items) > 0 {
 		item := removeList.Items[0]
-		a, err := loadAssignMessageRemoveHCL(item)
+		a, err := DecodeRemoveHCL(item)
 		if err != nil {
 			errors = multierror.Append(errors, err)
 		} else {
@@ -97,7 +98,7 @@ func LoadAssignMessageHCL(item *ast.ObjectItem) (interface{}, error) {
 
 	if setList := listVal.Filter("set"); len(setList.Items) > 0 {
 		item := setList.Items[0]
-		a, err := loadAssignMessageSetHCL(item)
+		a, err := DecodeSetHCL(item)
 		if err != nil {
 			errors = multierror.Append(errors, err)
 		} else {
@@ -111,5 +112,5 @@ func LoadAssignMessageHCL(item *ast.ObjectItem) (interface{}, error) {
 		return nil, errors
 	}
 
-	return p, nil
+	return &p, nil
 }

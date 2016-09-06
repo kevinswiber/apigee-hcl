@@ -1,22 +1,23 @@
-package policy
+package statisticscollector
 
 import (
 	"fmt"
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
-	"github.com/kevinswiber/apigee-hcl/config/hclerror"
+	"github.com/kevinswiber/apigee-hcl/dsl/hclerror"
+	"github.com/kevinswiber/apigee-hcl/dsl/policies/policy"
 	"strings"
 )
 
-// StatisticsCollectorPolicy represents an <StatisticsCollector/> element.
+// StatisticsCollector represents an <StatisticsCollector/> element.
 //
 // Documentation: http://docs.apigee.com/api-services/reference/statistics-collector-policy
-type StatisticsCollectorPolicy struct {
-	XMLName     string `xml:"StatisticsCollector" hcl:"-"`
-	Policy      `hcl:",squash"`
-	DisplayName string         `xml:",omitempty" hcl:"display_name"`
-	Statistics  []*scStatistic `xml:"Statistics>Statistic" hcl:"statistic"`
+type StatisticsCollector struct {
+	XMLName       string `xml:"StatisticsCollector" hcl:"-"`
+	policy.Policy `hcl:",squash"`
+	DisplayName   string         `xml:",omitempty" hcl:"display_name"`
+	Statistics    []*scStatistic `xml:"Statistics>Statistic" hcl:"statistic"`
 }
 
 type scStatistic struct {
@@ -27,12 +28,12 @@ type scStatistic struct {
 	Value   string `xml:",chardata" hcl:"value"`
 }
 
-// LoadStatisticsCollectorHCL converts an HCL ast.ObjectItem into an StatisticsCollectorPolicy object.
-func LoadStatisticsCollectorHCL(item *ast.ObjectItem) (interface{}, error) {
+// DecodeHCL converts an HCL ast.ObjectItem into an StatisticsCollector object.
+func DecodeHCL(item *ast.ObjectItem) (interface{}, error) {
 	var errors *multierror.Error
-	var p StatisticsCollectorPolicy
+	var p StatisticsCollector
 
-	if err := LoadCommonPolicyHCL(item, &p.Policy); err != nil {
+	if err := policy.DecodeHCL(item, &p.Policy); err != nil {
 		return nil, err
 	}
 
@@ -53,7 +54,7 @@ func LoadStatisticsCollectorHCL(item *ast.ObjectItem) (interface{}, error) {
 	}
 
 	if statsList := listVal.Filter("statistic"); len(statsList.Items) > 0 {
-		stats, err := loadStatisticsCollectorStatisticHCL(statsList.Items)
+		stats, err := decodeStatisticHCL(statsList.Items)
 		if err != nil {
 			errors = multierror.Append(errors, err)
 		} else {
@@ -65,10 +66,10 @@ func LoadStatisticsCollectorHCL(item *ast.ObjectItem) (interface{}, error) {
 		return nil, errors
 	}
 
-	return p, nil
+	return &p, nil
 }
 
-func loadStatisticsCollectorStatisticHCL(items []*ast.ObjectItem) ([]*scStatistic, error) {
+func decodeStatisticHCL(items []*ast.ObjectItem) ([]*scStatistic, error) {
 	var errors *multierror.Error
 	var stats []*scStatistic
 	for _, item := range items {

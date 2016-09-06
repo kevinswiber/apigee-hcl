@@ -1,4 +1,4 @@
-package common
+package properties
 
 import (
 	"fmt"
@@ -14,8 +14,8 @@ type Property struct {
 	Value   interface{} `xml:",chardata" hcl:"-"`
 }
 
-// LoadPropertiesHCL converts an ast.ObjectItem into Property objects.
-func LoadPropertiesHCL(item *ast.ObjectItem) ([]*Property, error) {
+// DecodeHCL converts an ast.ObjectItem into Property objects.
+func DecodeHCL(item *ast.ObjectItem) ([]*Property, error) {
 	var propsVal *ast.ObjectList
 	if ot, ok := item.Val.(*ast.ObjectType); ok {
 		propsVal = ot.List

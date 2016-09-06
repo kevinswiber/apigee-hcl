@@ -5,8 +5,8 @@ import (
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
-	"github.com/kevinswiber/apigee-hcl/config/common"
-	"github.com/kevinswiber/apigee-hcl/config/hclerror"
+	"github.com/kevinswiber/apigee-hcl/dsl/hclerror"
+	"github.com/kevinswiber/apigee-hcl/dsl/properties"
 )
 
 // TargetEndpoint represents a <TargetEndpoint/> element.
@@ -31,10 +31,10 @@ type TargetEndpoint struct {
 //
 // Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#targetendpoint-targetendpointconfigurationelements
 type HTTPTargetConnection struct {
-	XMLName      string             `xml:"HTTPTargetConnection" hcl:"-"`
-	URL          string             `hcl:"url"`
-	LoadBalancer *LoadBalancer      `hcl:"load_balancer"`
-	Properties   []*common.Property `xml:"Properties>Property" hcl:"properties"`
+	XMLName      string                 `xml:"HTTPTargetConnection" hcl:"-"`
+	URL          string                 `hcl:"url"`
+	LoadBalancer *LoadBalancer          `hcl:"load_balancer"`
+	Properties   []*properties.Property `xml:"Properties>Property" hcl:"properties"`
 }
 
 // LoadBalancer represents a <LoadBalancer/> element in an
@@ -105,114 +105,109 @@ type LoadBalancerServer struct {
 	IsFallback bool   `xml:",omitempty" hcl:"is_fallback"`
 }
 
-// LoadTargetEndpointsHCL converts an HCL ast.ObjectList into TargetEndpoint objects
-func LoadTargetEndpointsHCL(list *ast.ObjectList) ([]*TargetEndpoint, error) {
+// DecodeTargetEndpointHCL converts an HCL ast.ObjectItem into a TargetEndpoint object.
+func DecodeTargetEndpointHCL(item *ast.ObjectItem) (*TargetEndpoint, error) {
 	var errors *multierror.Error
-	var result []*TargetEndpoint
-	for _, item := range list.Items {
-		if len(item.Keys) == 0 || item.Keys[0].Token.Value() == "" {
-			pos := item.Val.Pos()
-			newError := hclerror.PosError{
-				Pos: pos,
-				Err: fmt.Errorf("target endpoint requires a name"),
-			}
-
-			errors = multierror.Append(errors, &newError)
-			continue
-		}
-		n := item.Keys[0].Token.Value().(string)
-
-		var listVal *ast.ObjectList
-		if ot, ok := item.Val.(*ast.ObjectType); ok {
-			listVal = ot.List
-		} else {
-			errors = multierror.Append(errors, fmt.Errorf("target endpoint is not an object"))
-			return nil, errors
+	if len(item.Keys) == 0 || item.Keys[0].Token.Value() == "" {
+		pos := item.Val.Pos()
+		newError := hclerror.PosError{
+			Pos: pos,
+			Err: fmt.Errorf("target endpoint requires a name"),
 		}
 
-		var targetEndpoint TargetEndpoint
+		errors = multierror.Append(errors, &newError)
+		return nil, errors
+	}
+	n := item.Keys[0].Token.Value().(string)
 
-		if err := hcl.DecodeObject(&targetEndpoint, item.Val); err != nil {
+	var listVal *ast.ObjectList
+	if ot, ok := item.Val.(*ast.ObjectType); ok {
+		listVal = ot.List
+	} else {
+		errors = multierror.Append(errors, fmt.Errorf("target endpoint is not an object"))
+		return nil, errors
+	}
+
+	var targetEndpoint TargetEndpoint
+
+	if err := hcl.DecodeObject(&targetEndpoint, item.Val); err != nil {
+		errors = multierror.Append(errors, err)
+		return nil, errors
+	}
+
+	targetEndpoint.Name = n
+
+	if preFlow := listVal.Filter("pre_flow"); len(preFlow.Items) > 0 {
+		preFlow, err := decodePreFlowHCL(preFlow)
+		if err != nil {
 			errors = multierror.Append(errors, err)
-			return nil, errors
+		} else {
+			targetEndpoint.PreFlow = preFlow
 		}
+	}
 
-		targetEndpoint.Name = n
-
-		if preFlow := listVal.Filter("pre_flow"); len(preFlow.Items) > 0 {
-			preFlow, err := loadPreFlowHCL(preFlow)
-			if err != nil {
-				errors = multierror.Append(errors, err)
-			} else {
-				targetEndpoint.PreFlow = preFlow
-			}
+	if flows := listVal.Filter("flow"); len(flows.Items) > 0 {
+		flows, err := decodeFlowsHCL(flows)
+		if err != nil {
+			errors = multierror.Append(errors, err)
+		} else {
+			targetEndpoint.Flows = flows
 		}
+	}
 
-		if flows := listVal.Filter("flow"); len(flows.Items) > 0 {
-			flows, err := loadFlowsHCL(flows)
-			if err != nil {
-				errors = multierror.Append(errors, err)
-			} else {
-				targetEndpoint.Flows = flows
-			}
+	if postFlow := listVal.Filter("post_flow"); len(postFlow.Items) > 0 {
+		postFlow, err := decodePostFlowHCL(postFlow)
+		if err != nil {
+			errors = multierror.Append(errors, err)
+		} else {
+			targetEndpoint.PostFlow = postFlow
 		}
+	}
 
-		if postFlow := listVal.Filter("post_flow"); len(postFlow.Items) > 0 {
-			postFlow, err := loadPostFlowHCL(postFlow)
-			if err != nil {
-				errors = multierror.Append(errors, err)
-			} else {
-				targetEndpoint.PostFlow = postFlow
-			}
+	if faultRulesList := listVal.Filter("fault_rule"); len(faultRulesList.Items) > 0 {
+		faultRules, err := decodeFaultRulesHCL(faultRulesList)
+		if err != nil {
+			errors = multierror.Append(errors, err)
+		} else {
+			targetEndpoint.FaultRules = faultRules
 		}
+	}
 
-		if faultRulesList := listVal.Filter("fault_rule"); len(faultRulesList.Items) > 0 {
-			faultRules, err := loadFaultRulesHCL(faultRulesList)
-			if err != nil {
-				errors = multierror.Append(errors, err)
-			} else {
-				targetEndpoint.FaultRules = faultRules
-			}
+	if defaultFaultRulesList := listVal.Filter("default_fault_rule"); len(defaultFaultRulesList.Items) > 0 {
+		faultRule, err := decodeDefaultFaultRuleHCL(defaultFaultRulesList.Items[0])
+		if err != nil {
+			errors = multierror.Append(errors, err)
+		} else {
+			targetEndpoint.DefaultFaultRule = faultRule
 		}
+	}
 
-		if defaultFaultRulesList := listVal.Filter("default_fault_rule"); len(defaultFaultRulesList.Items) > 0 {
-			faultRule, err := loadDefaultFaultRuleHCL(defaultFaultRulesList.Items[0])
-			if err != nil {
-				errors = multierror.Append(errors, err)
-			} else {
-				targetEndpoint.DefaultFaultRule = faultRule
-			}
+	if htcList := listVal.Filter("http_target_connection"); len(htcList.Items) > 0 {
+		htc, err := DecodeHTTPTargetConnectionHCL(htcList.Items[0])
+		if err != nil {
+			errors = multierror.Append(errors, err)
+		} else {
+			targetEndpoint.HTTPTargetConnection = htc
 		}
+	}
 
-		if htcList := listVal.Filter("http_target_connection"); len(htcList.Items) > 0 {
-			htc, err := LoadHTTPTargetConnectionHCL(htcList.Items[0])
-			if err != nil {
-				errors = multierror.Append(errors, err)
-			} else {
-				targetEndpoint.HTTPTargetConnection = htc
-			}
+	if scriptTargetList := listVal.Filter("script_target"); len(scriptTargetList.Items) > 0 {
+		st, err := decodeTargetEndpointScriptTargetHCL(scriptTargetList.Items[0])
+		if err != nil {
+			errors = multierror.Append(errors, err)
+		} else {
+			targetEndpoint.ScriptTarget = st
 		}
-
-		if scriptTargetList := listVal.Filter("script_target"); len(scriptTargetList.Items) > 0 {
-			st, err := loadTargetEndpointScriptTargetHCL(scriptTargetList.Items[0])
-			if err != nil {
-				errors = multierror.Append(errors, err)
-			} else {
-				targetEndpoint.ScriptTarget = st
-			}
-		}
-
-		result = append(result, &targetEndpoint)
 	}
 
 	if errors != nil {
 		return nil, errors
 	}
 
-	return result, nil
+	return &targetEndpoint, nil
 }
 
-func loadTargetEndpointScriptTargetHCL(item *ast.ObjectItem) (*ScriptTarget, error) {
+func decodeTargetEndpointScriptTargetHCL(item *ast.ObjectItem) (*ScriptTarget, error) {
 	var st ScriptTarget
 
 	if err := hcl.DecodeObject(&st, item.Val); err != nil {
@@ -227,7 +222,7 @@ func loadTargetEndpointScriptTargetHCL(item *ast.ObjectItem) (*ScriptTarget, err
 	}
 
 	if envsList := listVal.Filter("environment_variables"); len(envsList.Items) > 0 {
-		envs, err := loadTargetEndpointScriptTargetEnvironmentVariablesHCL(envsList.Items[0])
+		envs, err := decodeTargetEndpointScriptTargetEnvironmentVariablesHCL(envsList.Items[0])
 		if err != nil {
 			return nil, err
 		}
@@ -238,7 +233,7 @@ func loadTargetEndpointScriptTargetHCL(item *ast.ObjectItem) (*ScriptTarget, err
 	return &st, nil
 }
 
-func loadTargetEndpointScriptTargetEnvironmentVariablesHCL(item *ast.ObjectItem) ([]*EnvironmentVariable, error) {
+func decodeTargetEndpointScriptTargetEnvironmentVariablesHCL(item *ast.ObjectItem) ([]*EnvironmentVariable, error) {
 	var envsVal *ast.ObjectList
 	if ot, ok := item.Val.(*ast.ObjectType); ok {
 		envsVal = ot.List
@@ -260,8 +255,8 @@ func loadTargetEndpointScriptTargetEnvironmentVariablesHCL(item *ast.ObjectItem)
 	return newEnvs, nil
 }
 
-// LoadHTTPTargetConnectionHCL converts an HCL ast.ObjectItem into an HTTPTargetConnection object.
-func LoadHTTPTargetConnectionHCL(item *ast.ObjectItem) (*HTTPTargetConnection, error) {
+// DecodeHTTPTargetConnectionHCL converts an HCL ast.ObjectItem into an HTTPTargetConnection object.
+func DecodeHTTPTargetConnectionHCL(item *ast.ObjectItem) (*HTTPTargetConnection, error) {
 	var htc HTTPTargetConnection
 
 	if err := hcl.DecodeObject(&htc, item.Val); err != nil {
@@ -276,7 +271,7 @@ func LoadHTTPTargetConnectionHCL(item *ast.ObjectItem) (*HTTPTargetConnection, e
 	}
 
 	if propsList := listVal.Filter("properties"); len(propsList.Items) > 0 {
-		props, err := common.LoadPropertiesHCL(propsList.Items[0])
+		props, err := properties.DecodeHCL(propsList.Items[0])
 		if err != nil {
 			return nil, err
 		}

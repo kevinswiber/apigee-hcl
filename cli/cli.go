@@ -8,13 +8,12 @@ import (
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
 	hclParser "github.com/hashicorp/hcl/hcl/parser"
-	"github.com/kevinswiber/apigee-hcl/config"
-	"github.com/kevinswiber/apigee-hcl/config/hclerror"
+	"github.com/kevinswiber/apigee-hcl/dsl"
+	"github.com/kevinswiber/apigee-hcl/dsl/hclerror"
 	"io/ioutil"
 	"log"
 	"os"
 	"path"
-	"reflect"
 	"strings"
 )
 
@@ -56,7 +55,7 @@ func Start(opts *Options) {
 		l.Fatal(errors)
 	}
 
-	var c config.Config
+	var c dsl.Config
 
 	for _, file := range opts.InputHCL {
 		d, err := ioutil.ReadFile(file)
@@ -89,7 +88,7 @@ func Start(opts *Options) {
 			l.Fatal(errors)
 		}
 
-		cfg, err := config.LoadConfigFromHCL(list)
+		cfg, err := dsl.DecodeConfigHCL(list)
 		if err != nil {
 			if merr, ok := err.(*multierror.Error); ok {
 				attachFilenameToPosErrors(file, merr)
@@ -213,8 +212,7 @@ func Start(opts *Options) {
 				l.Fatal(errors)
 			}
 
-			val := reflect.ValueOf(policy)
-			name := val.FieldByName("Name").String()
+			name := policy.Name()
 
 			output = []byte(xml.Header + string(output))
 			ePath := path.Join(policiesPath, name+".xml")
@@ -276,10 +274,8 @@ func attachFilenameToPosErrors(file string, errors *multierror.Error) {
 	for _, e := range errors.Errors {
 		switch e.(type) {
 		case *hclerror.PosError:
-			e2 := e.(*hclerror.PosError)
-			e2.Pos.Filename = file
 		case *hclParser.PosError:
-			e2 := e.(*hclParser.PosError)
+			e2 := e.(*hclerror.PosError)
 			e2.Pos.Filename = file
 		case *multierror.Error:
 			attachFilenameToPosErrors(file, e.(*multierror.Error))
