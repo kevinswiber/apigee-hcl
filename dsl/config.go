@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/hcl/hcl/ast"
+	hclEncoding "github.com/kevinswiber/apigee-hcl/dsl/encoding/hcl"
 	"github.com/kevinswiber/apigee-hcl/dsl/endpoints"
-	"github.com/kevinswiber/apigee-hcl/dsl/hclerror"
 	"github.com/kevinswiber/apigee-hcl/dsl/policies/policy"
 )
 
@@ -70,7 +70,7 @@ func DecodeConfigHCL(list *ast.ObjectList) (*Config, error) {
 				item.Keys[0].Token.Value() == "" ||
 				item.Keys[1].Token.Value() == "" {
 				pos := item.Val.Pos()
-				newError := hclerror.PosError{
+				newError := hclEncoding.PosError{
 					Pos: pos,
 					Err: fmt.Errorf("policy requires a type and name"),
 				}

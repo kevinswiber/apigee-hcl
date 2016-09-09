@@ -1,4 +1,4 @@
-package hclerror
+package hcl
 
 import (
 	"fmt"

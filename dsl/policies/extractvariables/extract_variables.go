@@ -5,7 +5,7 @@ import (
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
-	"github.com/kevinswiber/apigee-hcl/dsl/hclerror"
+	hclEncoding "github.com/kevinswiber/apigee-hcl/dsl/encoding/hcl"
 	"github.com/kevinswiber/apigee-hcl/dsl/policies/policy"
 )
 
@@ -114,7 +114,7 @@ func DecodeHCL(item *ast.ObjectItem) (interface{}, error) {
 		listVal = ot.List
 	} else {
 		pos := item.Val.Pos()
-		newError := hclerror.PosError{
+		newError := hclEncoding.PosError{
 			Pos: pos,
 			Err: fmt.Errorf("extract variables policy not an object"),
 		}
@@ -192,7 +192,7 @@ func DecodeHCL(item *ast.ObjectItem) (interface{}, error) {
 		len(p.FormParams) == 0 && len(p.Variables) == 0 &&
 		p.JSONPayload == nil && p.XMLPayload == nil {
 		pos := item.Val.Pos()
-		newError := hclerror.PosError{
+		newError := hclEncoding.PosError{
 			Pos: pos,
 			Err: fmt.Errorf("extract variables requires one of uri_path, query_param, " +
 				"header, form_param, json_payload, or xml_payload"),
@@ -218,7 +218,7 @@ func decodeURIPathsHCL(items []*ast.ObjectItem) ([]*evURIPath, error) {
 			listVal = ot.List
 		} else {
 			pos := item.Val.Pos()
-			newError := hclerror.PosError{
+			newError := hclEncoding.PosError{
 				Pos: pos,
 				Err: fmt.Errorf("uri_path not an object"),
 			}
@@ -253,7 +253,7 @@ func decodeQueryParamsHCL(items []*ast.ObjectItem) ([]*evQueryParam, error) {
 			listVal = ot.List
 		} else {
 			pos := item.Val.Pos()
-			newError := hclerror.PosError{
+			newError := hclEncoding.PosError{
 				Pos: pos,
 				Err: fmt.Errorf("query_param not an object"),
 			}
@@ -266,7 +266,7 @@ func decodeQueryParamsHCL(items []*ast.ObjectItem) ([]*evQueryParam, error) {
 
 		if len(item.Keys) == 0 || item.Keys[0].Token.Value().(string) == "" {
 			pos := item.Val.Pos()
-			newError := hclerror.PosError{
+			newError := hclEncoding.PosError{
 				Pos: pos,
 				Err: fmt.Errorf("query_param requires a name"),
 			}
@@ -299,7 +299,7 @@ func decodeHeadersHCL(items []*ast.ObjectItem) ([]*evHeader, error) {
 			listVal = ot.List
 		} else {
 			pos := item.Val.Pos()
-			newError := hclerror.PosError{
+			newError := hclEncoding.PosError{
 				Pos: pos,
 				Err: fmt.Errorf("header not an object"),
 			}
@@ -312,7 +312,7 @@ func decodeHeadersHCL(items []*ast.ObjectItem) ([]*evHeader, error) {
 
 		if len(item.Keys) == 0 || item.Keys[0].Token.Value().(string) == "" {
 			pos := item.Val.Pos()
-			newError := hclerror.PosError{
+			newError := hclEncoding.PosError{
 				Pos: pos,
 				Err: fmt.Errorf("header requires a name"),
 			}
@@ -345,7 +345,7 @@ func decodeFormParamsHCL(items []*ast.ObjectItem) ([]*evFormParam, error) {
 			listVal = ot.List
 		} else {
 			pos := item.Val.Pos()
-			newError := hclerror.PosError{
+			newError := hclEncoding.PosError{
 				Pos: pos,
 				Err: fmt.Errorf("form_param not an object"),
 			}
@@ -358,7 +358,7 @@ func decodeFormParamsHCL(items []*ast.ObjectItem) ([]*evFormParam, error) {
 
 		if len(item.Keys) == 0 || item.Keys[0].Token.Value().(string) == "" {
 			pos := item.Val.Pos()
-			newError := hclerror.PosError{
+			newError := hclEncoding.PosError{
 				Pos: pos,
 				Err: fmt.Errorf("form_param requires a name"),
 			}
@@ -391,7 +391,7 @@ func decodeVariablesHCL(items []*ast.ObjectItem) ([]*evVariable, error) {
 			listVal = ot.List
 		} else {
 			pos := item.Val.Pos()
-			newError := hclerror.PosError{
+			newError := hclEncoding.PosError{
 				Pos: pos,
 				Err: fmt.Errorf("variable not an object"),
 			}
@@ -404,7 +404,7 @@ func decodeVariablesHCL(items []*ast.ObjectItem) ([]*evVariable, error) {
 
 		if len(item.Keys) == 0 || item.Keys[0].Token.Value().(string) == "" {
 			pos := item.Val.Pos()
-			newError := hclerror.PosError{
+			newError := hclEncoding.PosError{
 				Pos: pos,
 				Err: fmt.Errorf("variable requires a name"),
 			}
@@ -435,7 +435,7 @@ func decodeJSONPayloadHCL(item *ast.ObjectItem) (*evJSONPayload, error) {
 		listVal = ot.List
 	} else {
 		pos := item.Val.Pos()
-		newError := hclerror.PosError{
+		newError := hclEncoding.PosError{
 			Pos: pos,
 			Err: fmt.Errorf("json_payload not an object"),
 		}
@@ -465,7 +465,7 @@ func decodeJSONPayloadVariablesHCL(items []*ast.ObjectItem) ([]*evJSONPayloadVar
 
 		if _, ok := item.Val.(*ast.ObjectType); !ok {
 			pos := item.Val.Pos()
-			newError := hclerror.PosError{
+			newError := hclEncoding.PosError{
 				Pos: pos,
 				Err: fmt.Errorf("variable not an object"),
 			}
@@ -478,7 +478,7 @@ func decodeJSONPayloadVariablesHCL(items []*ast.ObjectItem) ([]*evJSONPayloadVar
 
 		if len(item.Keys) == 0 || item.Keys[0].Token.Value().(string) == "" {
 			pos := item.Val.Pos()
-			newError := hclerror.PosError{
+			newError := hclEncoding.PosError{
 				Pos: pos,
 				Err: fmt.Errorf("variable requires a name"),
 			}
@@ -501,7 +501,7 @@ func decodeXMLPayloadHCL(item *ast.ObjectItem) (*evXMLPayload, error) {
 		listVal = ot.List
 	} else {
 		pos := item.Val.Pos()
-		newError := hclerror.PosError{
+		newError := hclEncoding.PosError{
 			Pos: pos,
 			Err: fmt.Errorf("xml_payload not an object"),
 		}
@@ -540,7 +540,7 @@ func decodeXMLPayloadVariablesHCL(items []*ast.ObjectItem) ([]*evXMLPayloadVaria
 
 		if _, ok := item.Val.(*ast.ObjectType); !ok {
 			pos := item.Val.Pos()
-			newError := hclerror.PosError{
+			newError := hclEncoding.PosError{
 				Pos: pos,
 				Err: fmt.Errorf("variable not an object"),
 			}
@@ -553,7 +553,7 @@ func decodeXMLPayloadVariablesHCL(items []*ast.ObjectItem) ([]*evXMLPayloadVaria
 
 		if len(item.Keys) == 0 || item.Keys[0].Token.Value().(string) == "" {
 			pos := item.Val.Pos()
-			newError := hclerror.PosError{
+			newError := hclEncoding.PosError{
 				Pos: pos,
 				Err: fmt.Errorf("variable requires a name"),
 			}
@@ -575,7 +575,7 @@ func decodeXMLPayloadNamespacesHCL(items []*ast.ObjectItem) ([]*evXMLPayloadName
 
 		if _, ok := item.Val.(*ast.ObjectType); !ok {
 			pos := item.Val.Pos()
-			newError := hclerror.PosError{
+			newError := hclEncoding.PosError{
 				Pos: pos,
 				Err: fmt.Errorf("namespace not an object"),
 			}
@@ -588,7 +588,7 @@ func decodeXMLPayloadNamespacesHCL(items []*ast.ObjectItem) ([]*evXMLPayloadName
 
 		if len(item.Keys) == 0 || item.Keys[0].Token.Value().(string) == "" {
 			pos := item.Val.Pos()
-			newError := hclerror.PosError{
+			newError := hclEncoding.PosError{
 				Pos: pos,
 				Err: fmt.Errorf("namespace requires a name"),
 			}
@@ -610,7 +610,7 @@ func decodePatternsHCL(items []*ast.ObjectItem) ([]*evPattern, error) {
 
 		if _, ok := item.Val.(*ast.ObjectType); !ok {
 			pos := item.Val.Pos()
-			newError := hclerror.PosError{
+			newError := hclEncoding.PosError{
 				Pos: pos,
 				Err: fmt.Errorf("pattern not an object"),
 			}

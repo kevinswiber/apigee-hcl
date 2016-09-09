@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/hcl/hcl/ast"
 	hclParser "github.com/hashicorp/hcl/hcl/parser"
 	"github.com/kevinswiber/apigee-hcl/dsl"
-	"github.com/kevinswiber/apigee-hcl/dsl/hclerror"
+	hclEncoding "github.com/kevinswiber/apigee-hcl/dsl/encoding/hcl"
 	"io/ioutil"
 	"log"
 	"os"
@@ -69,7 +69,7 @@ func Start(opts *Options) {
 			switch err.(type) {
 			case *hclParser.PosError:
 				e := err.(*hclParser.PosError)
-				e2 := &hclerror.PosError{
+				e2 := &hclEncoding.PosError{
 					Pos: e.Pos,
 					Err: e.Err,
 				}
@@ -273,9 +273,9 @@ func ensureDirectory(path string) error {
 func attachFilenameToPosErrors(file string, errors *multierror.Error) {
 	for _, e := range errors.Errors {
 		switch e.(type) {
-		case *hclerror.PosError:
+		case *hclEncoding.PosError:
 		case *hclParser.PosError:
-			e2 := e.(*hclerror.PosError)
+			e2 := e.(*hclEncoding.PosError)
 			e2.Pos.Filename = file
 		case *multierror.Error:
 			attachFilenameToPosErrors(file, e.(*multierror.Error))

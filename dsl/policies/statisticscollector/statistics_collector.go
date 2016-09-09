@@ -5,7 +5,7 @@ import (
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
-	"github.com/kevinswiber/apigee-hcl/dsl/hclerror"
+	hclEncoding "github.com/kevinswiber/apigee-hcl/dsl/encoding/hcl"
 	"github.com/kevinswiber/apigee-hcl/dsl/policies/policy"
 	"strings"
 )
@@ -42,7 +42,7 @@ func DecodeHCL(item *ast.ObjectItem) (interface{}, error) {
 		listVal = ot.List
 	} else {
 		pos := item.Val.Pos()
-		newError := hclerror.PosError{
+		newError := hclEncoding.PosError{
 			Pos: pos,
 			Err: fmt.Errorf("statistics_collector policy not an object"),
 		}
@@ -77,7 +77,7 @@ func decodeStatisticHCL(items []*ast.ObjectItem) ([]*scStatistic, error) {
 
 		if _, ok := item.Val.(*ast.ObjectType); !ok {
 			pos := item.Val.Pos()
-			newError := hclerror.PosError{
+			newError := hclEncoding.PosError{
 				Pos: pos,
 				Err: fmt.Errorf("statistic not an object"),
 			}
@@ -90,7 +90,7 @@ func decodeStatisticHCL(items []*ast.ObjectItem) ([]*scStatistic, error) {
 
 		if len(item.Keys) == 0 || item.Keys[0].Token.Value().(string) == "" {
 			pos := item.Val.Pos()
-			newError := hclerror.PosError{
+			newError := hclEncoding.PosError{
 				Pos: pos,
 				Err: fmt.Errorf("statistic requires a name"),
 			}
@@ -101,7 +101,7 @@ func decodeStatisticHCL(items []*ast.ObjectItem) ([]*scStatistic, error) {
 
 		if stat.Ref == "" {
 			pos := item.Val.Pos()
-			newError := hclerror.PosError{
+			newError := hclEncoding.PosError{
 				Pos: pos,
 				Err: fmt.Errorf("statistic requires a ref value"),
 			}
@@ -111,7 +111,7 @@ func decodeStatisticHCL(items []*ast.ObjectItem) ([]*scStatistic, error) {
 		validTypes := []string{"string", "integer", "float", "long", "double"}
 		if stat.Type == "" {
 			pos := item.Val.Pos()
-			newError := hclerror.PosError{
+			newError := hclEncoding.PosError{
 				Pos: pos,
 				Err: fmt.Errorf("statistic requires a type value"),
 			}
@@ -127,7 +127,7 @@ func decodeStatisticHCL(items []*ast.ObjectItem) ([]*scStatistic, error) {
 
 			if !hasValidType {
 				pos := item.Val.Pos()
-				newError := hclerror.PosError{
+				newError := hclEncoding.PosError{
 					Pos: pos,
 					Err: fmt.Errorf("statistic requires a valid type value [%s]",
 						strings.Join(validTypes, ", ")),

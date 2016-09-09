@@ -5,7 +5,7 @@ import (
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
-	"github.com/kevinswiber/apigee-hcl/dsl/hclerror"
+	hclEncoding "github.com/kevinswiber/apigee-hcl/dsl/encoding/hcl"
 )
 
 // Proxy represents an <APIProxy/> element in an Apigee proxy bundle
@@ -24,7 +24,7 @@ func decodeProxyHCL(list *ast.ObjectList) (*Proxy, error) {
 	var item = list.Items[0]
 	if len(item.Keys) == 0 || item.Keys[0].Token.Value() == "" {
 		pos := item.Val.Pos()
-		newError := hclerror.PosError{
+		newError := hclEncoding.PosError{
 			Pos: pos,
 			Err: fmt.Errorf("proxy requires a name"),
 		}

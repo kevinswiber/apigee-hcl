@@ -5,7 +5,7 @@ import (
 	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
-	"github.com/kevinswiber/apigee-hcl/dsl/hclerror"
+	hclEncoding "github.com/kevinswiber/apigee-hcl/dsl/encoding/hcl"
 	"github.com/kevinswiber/apigee-hcl/dsl/properties"
 )
 
@@ -52,7 +52,7 @@ func DecodeProxyEndpointHCL(item *ast.ObjectItem) (*ProxyEndpoint, error) {
 	var errors *multierror.Error
 	if len(item.Keys) == 0 || item.Keys[0].Token.Value() == "" {
 		pos := item.Val.Pos()
-		newError := hclerror.PosError{
+		newError := hclEncoding.PosError{
 			Pos: pos,
 			Err: fmt.Errorf("proxy endpoint requires a name"),
 		}
@@ -68,7 +68,7 @@ func DecodeProxyEndpointHCL(item *ast.ObjectItem) (*ProxyEndpoint, error) {
 		listVal = ot.List
 	} else {
 		pos := item.Val.Pos()
-		newError := hclerror.PosError{
+		newError := hclEncoding.PosError{
 			Pos: pos,
 			Err: fmt.Errorf("proxy endpoint is not an object"),
 		}

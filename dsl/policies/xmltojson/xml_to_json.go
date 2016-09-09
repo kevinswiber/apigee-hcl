@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
-	"github.com/kevinswiber/apigee-hcl/dsl/hclerror"
+	hclEncoding "github.com/kevinswiber/apigee-hcl/dsl/encoding/hcl"
 	"github.com/kevinswiber/apigee-hcl/dsl/policies/policy"
 )
 
@@ -64,7 +64,7 @@ func DecodeHCL(item *ast.ObjectItem) (interface{}, error) {
 
 	if p.Options != nil && p.Format != "" {
 		pos := item.Val.Pos()
-		newError := hclerror.PosError{
+		newError := hclEncoding.PosError{
 			Pos: pos,
 			Err: fmt.Errorf("xml_to_json must specify either options or format, not both"),
 		}
@@ -73,7 +73,7 @@ func DecodeHCL(item *ast.ObjectItem) (interface{}, error) {
 
 	if p.Options == nil && p.Format == "" {
 		pos := item.Val.Pos()
-		newError := hclerror.PosError{
+		newError := hclEncoding.PosError{
 			Pos: pos,
 			Err: fmt.Errorf("xml_to_json must specify either options or format"),
 		}
@@ -84,7 +84,7 @@ func DecodeHCL(item *ast.ObjectItem) (interface{}, error) {
 		if p.Options.DefaultNamespaceNodeName == "" ||
 			p.Options.NamespaceSeparator == "" {
 			pos := item.Val.Pos()
-			newError := hclerror.PosError{
+			newError := hclEncoding.PosError{
 				Pos: pos,
 				Err: fmt.Errorf("xml_to_json must specify default_namespace_node_name and " +
 					"namespace_separator when namespace_block_name is used"),
