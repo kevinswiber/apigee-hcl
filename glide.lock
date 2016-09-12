@@ -1,12 +1,14 @@
-hash: c0ca973e999a2549a3f10ece7c5722adbab982ffd49187ce80c71d8b81748bf4
-updated: 2016-08-31T15:00:54.041948779-07:00
+hash: deea5edf82dada2579345a1d44141ff9636b4040ee9afb000c6d0a4533564746
+updated: 2016-09-09T14:30:18.812019922-07:00
 imports:
 - name: github.com/crufter/copyrecur
   version: c927f40d072603b07779128116db68f40bf410d2
+- name: github.com/hashicorp/errwrap
+  version: 7554cd9344cec97297fa6649b055a8c98c2a1e55
 - name: github.com/hashicorp/go-multierror
   version: 8c5f0ad9360406a3807ce7de6bc73269a91a6e51
 - name: github.com/hashicorp/hcl
-  version: baeb59c710717b06aac1dbe2270e8192ec593244
+  version: 99df0eb941dd8ddbc83d3f3605a34f6a686ac85e
   subpackages:
   - hcl/ast
   - hcl/parser
@@ -16,4 +18,6 @@ imports:
   - hcl/strconv
   - json/scanner
   - json/token
+- name: github.com/rodaine/hclencoder
+  version: b800c664d690f7524e797eae05b122646465572a
 testImports: []

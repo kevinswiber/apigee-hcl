@@ -3,3 +3,4 @@ import:
 - package: github.com/hashicorp/hcl
 - package: github.com/crufter/copyrecur
 - package: github.com/hashicorp/go-multierror
+- package: github.com/rodaine/hclencoder

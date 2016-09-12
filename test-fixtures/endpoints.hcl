@@ -81,6 +81,10 @@ target_endpoint "default" {
         is_fallback = true
       }
     }
+
+    properties {
+      testprop = 123.45
+    }
   }
 
   local_target_connection {

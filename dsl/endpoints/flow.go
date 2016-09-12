@@ -12,9 +12,9 @@ import (
 //
 // Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#flows
 type PreFlow struct {
-	XMLName  string       `xml:"PreFlow" hcl:"-"`
-	Request  FlowRequest  `hcl:"request"`
-	Response FlowResponse `hcl:"response"`
+	XMLName  string       `xml:"PreFlow" hcl:"-" hcle:"omit"`
+	Request  FlowRequest  `hcl:"request" hcle:"omitempty"`
+	Response FlowResponse `hcl:"response" hcle:"omitempty"`
 }
 
 // Flow represents a <Flow/> element for
@@ -22,11 +22,11 @@ type PreFlow struct {
 //
 // Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#flows
 type Flow struct {
-	XMLName   string       `xml:"Flow" hcl:"-"`
-	Name      string       `xml:"name,attr" hcl:"-"`
-	Condition string       `xml:",omitempty" hcl:"condition"`
-	Request   FlowRequest  `hcl:"request"`
-	Response  FlowResponse `hcl:"response"`
+	XMLName   string       `xml:"Flow" hcl:"-" hcle:"omit"`
+	Name      string       `xml:"name,attr" hcl:",key"`
+	Condition string       `xml:",omitempty" hcl:"condition" hcle:"omitempty"`
+	Request   FlowRequest  `hcl:"request" hcle:"omitempty"`
+	Response  FlowResponse `hcl:"response" hcle:"omitempty"`
 }
 
 // PostFlow represents a <PostFlow/> element for
@@ -34,9 +34,9 @@ type Flow struct {
 //
 // Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#flows
 type PostFlow struct {
-	XMLName  string       `xml:"PostFlow" hcl:"-"`
-	Request  FlowRequest  `hcl:"request"`
-	Response FlowResponse `hcl:"response"`
+	XMLName  string       `xml:"PostFlow" hcl:"-" hcle:"omit"`
+	Request  FlowRequest  `hcl:"request" hcle:"omitempty"`
+	Response FlowResponse `hcl:"response" hcle:"omitempty"`
 }
 
 // PostClientFlow represents a <PostClientFlow/> element for
@@ -44,9 +44,9 @@ type PostFlow struct {
 //
 // Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#flows
 type PostClientFlow struct {
-	XMLName  string       `xml:"PostClientFlow" hcl:"-"`
-	Request  FlowRequest  `hcl:"request"`
-	Response FlowResponse `hcl:"response"`
+	XMLName  string       `xml:"PostClientFlow" hcl:"-" hcle:"omit"`
+	Request  FlowRequest  `hcl:"request" hcle:"omitempty"`
+	Response FlowResponse `hcl:"response" hcle:"omitempty"`
 }
 
 // FaultRule represents a <FaultRule/> element for
@@ -54,10 +54,10 @@ type PostClientFlow struct {
 //
 // Documentation: http://docs.apigee.com/api-services/content/fault-handling
 type FaultRule struct {
-	XMLName   string      `xml:"FaultRule" hcl:"-"`
-	Name      string      `xml:"name,attr" hcl:"-"`
-	Condition string      `xml:",omitempty" hcl:"condition"`
-	Steps     []*FlowStep `xml:",innerxml" hcl:"step"`
+	XMLName   string      `xml:"FaultRule" hcl:"-" hcle:"omit"`
+	Name      string      `xml:"name,attr" hcl:",key"`
+	Condition string      `xml:",omitempty" hcl:"condition" hcle:"omitempty"`
+	Steps     []*FlowStep `xml:"Step" hcl:"step"`
 }
 
 // DefaultFaultRule represents a <DefaultFaultRule/> element for
@@ -65,11 +65,11 @@ type FaultRule struct {
 //
 // Documentation: http://docs.apigee.com/api-services/content/fault-handling
 type DefaultFaultRule struct {
-	XMLName       string      `xml:"DefaultFaultRule" hcl:"-"`
-	Name          string      `xml:"name,attr" hcl:"-"`
-	Condition     string      `xml:",omitempty" hcl:"condition"`
-	Steps         []*FlowStep `xml:",innerxml" hcl:"step"`
-	AlwaysEnforce bool        `xml:",omitempty" hcl:"always_enforce"`
+	XMLName       string      `xml:"DefaultFaultRule" hcl:"-" hcle:"omit"`
+	Name          string      `xml:"name,attr" hcl:",key"`
+	Condition     string      `xml:",omitempty" hcl:"condition" hcle:"omitempty"`
+	Steps         []*FlowStep `xml:"Step" hcl:"step"`
+	AlwaysEnforce bool        `xml:",omitempty" hcl:"always_enforce" hcle:"omitempty"`
 }
 
 // FlowStep represents a <Step/> element for
@@ -78,9 +78,9 @@ type DefaultFaultRule struct {
 //
 // Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#policies-policyattachment
 type FlowStep struct {
-	XMLName   string `xml:"Step"`
-	Name      string
-	Condition string `xml:",omitempty" hcl:"condition"`
+	XMLName   string `xml:"Step" hcl:"-" hcle:"omit"`
+	Name      string `hcl:",key"`
+	Condition string `xml:",omitempty" hcl:"condition" hcle:"omitempty"`
 }
 
 // FlowRequest represents a <Request/> element for
@@ -88,8 +88,8 @@ type FlowStep struct {
 //
 // Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#watchaquickhowtovideo-flowconfigurationelements
 type FlowRequest struct {
-	XMLName string      `xml:"Request" hcl:"-"`
-	Steps   []*FlowStep `xml:",innerxml" hcl:"step"`
+	XMLName string      `xml:"Request" hcl:"-" hcle:"omit"`
+	Steps   []*FlowStep `xml:"Step" hcl:"step"`
 }
 
 // FlowResponse represents a <Response/> element for
@@ -97,8 +97,8 @@ type FlowRequest struct {
 //
 // Documentation: http://docs.apigee.com/api-services/reference/api-proxy-configuration-reference#watchaquickhowtovideo-flowconfigurationelements
 type FlowResponse struct {
-	XMLName string      `xml:"Response" hcl:"-"`
-	Steps   []*FlowStep `xml:",innerxml" hcl:"step"`
+	XMLName string      `xml:"Response" hcl:"-" hcle:"omit"`
+	Steps   []*FlowStep `xml:"Step" hcl:"step"`
 }
 
 func decodePreFlowHCL(list *ast.ObjectList) (*PreFlow, error) {
@@ -256,14 +256,17 @@ func decodeFaultRulesHCL(list *ast.ObjectList) ([]*FaultRule, error) {
 	for _, item := range list.Items {
 		var faultRule FaultRule
 
-		steps, err := decodeFlowStepsHCL(item)
+		if err := hcl.DecodeObject(&faultRule, item); err != nil {
+			return nil, fmt.Errorf("error decoding fault rule object")
+		}
+		/*steps, err := decodeFlowStepsHCL(item)
 		if err != nil {
 			return nil, err
 		}
 
-		faultRule.Steps = steps
+		faultRule.Steps = steps*/
 
-		faultRule.Name = item.Keys[0].Token.Value().(string)
+		//faultRule.Name = item.Keys[0].Token.Value().(string)
 		result = append(result, &faultRule)
 	}
 
@@ -273,18 +276,18 @@ func decodeFaultRulesHCL(list *ast.ObjectList) ([]*FaultRule, error) {
 func decodeDefaultFaultRuleHCL(item *ast.ObjectItem) (*DefaultFaultRule, error) {
 	var faultRule DefaultFaultRule
 
-	if err := hcl.DecodeObject(&faultRule, item.Val); err != nil {
-		return nil, fmt.Errorf("error decoding step object")
+	if err := hcl.DecodeObject(&faultRule, item); err != nil {
+		return nil, fmt.Errorf("error decoding default fault rule object")
 	}
 
-	steps, err := decodeFlowStepsHCL(item)
-	if err != nil {
-		return nil, err
-	}
+	/*
+		steps, err := decodeFlowStepsHCL(item)
+		if err != nil {
+			return nil, err
+		}
 
-	faultRule.Steps = steps
-
-	faultRule.Name = item.Keys[0].Token.Value().(string)
+		faultRule.Steps = steps
+	*/
 
 	return &faultRule, nil
 }
@@ -301,10 +304,9 @@ func decodeFlowStepsHCL(list *ast.ObjectItem) ([]*FlowStep, error) {
 	if steps := listVal.Filter("step"); len(steps.Items) > 0 {
 		for _, step := range steps.Items {
 			var s FlowStep
-			if err := hcl.DecodeObject(&s, step.Val); err != nil {
+			if err := hcl.DecodeObject(&s, step); err != nil {
 				return nil, fmt.Errorf("error decoding step object")
 			}
-			s.Name = step.Keys[0].Token.Value().(string)
 
 			flowSteps = append(flowSteps, &s)
 		}

@@ -1,4 +1,4 @@
-package dsl
+package policies
 
 import (
 	"github.com/hashicorp/hcl/hcl/ast"
@@ -16,8 +16,8 @@ import (
 	"github.com/kevinswiber/apigee-hcl/dsl/policies/xmltojson"
 )
 
-// PolicyList is a map of HCL policy types to policy factory functions.
-var PolicyList = map[string]func(*ast.ObjectItem) (interface{}, error){
+// HCLDecoders is a map of HCL policy types to HCL decoder functions.
+var HCLDecoders = map[string]func(*ast.ObjectItem) (interface{}, error){
 	"assign_message":       assignmessage.DecodeHCL,
 	"extract_variables":    extractvariables.DecodeHCL,
 	"javascript":           javascript.DecodeHCL,

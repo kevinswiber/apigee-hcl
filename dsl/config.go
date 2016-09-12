@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/hcl/hcl/ast"
 	hclEncoding "github.com/kevinswiber/apigee-hcl/dsl/encoding/hcl"
 	"github.com/kevinswiber/apigee-hcl/dsl/endpoints"
+	"github.com/kevinswiber/apigee-hcl/dsl/policies"
 	"github.com/kevinswiber/apigee-hcl/dsl/policies/policy"
 )
 
@@ -49,14 +50,10 @@ func DecodeConfigHCL(list *ast.ObjectList) (*Config, error) {
 	}
 
 	if targetEndpoints := list.Filter("target_endpoint"); len(targetEndpoints.Items) > 0 {
-		var result []*endpoints.TargetEndpoint
-		for _, item := range targetEndpoints.Items {
-			targetEndpoint, err := endpoints.DecodeTargetEndpointHCL(item)
-			if err != nil {
-				errors = multierror.Append(errors, err)
-				return nil, errors
-			}
-			result = append(result, targetEndpoint)
+		result, err := endpoints.DecodeTargetEndpointsHCL(targetEndpoints)
+		if err != nil {
+			errors = multierror.Append(errors, err)
+			return nil, errors
 		}
 
 		c.TargetEndpoints = result
@@ -80,7 +77,7 @@ func DecodeConfigHCL(list *ast.ObjectList) (*Config, error) {
 			}
 			policyType := item.Keys[0].Token.Value().(string)
 
-			if f, ok := PolicyList[policyType]; ok {
+			if f, ok := policies.HCLDecoders[policyType]; ok {
 				p, err := f(item)
 				if err != nil {
 					errors = multierror.Append(errors, err)

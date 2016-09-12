@@ -274,8 +274,10 @@ func attachFilenameToPosErrors(file string, errors *multierror.Error) {
 	for _, e := range errors.Errors {
 		switch e.(type) {
 		case *hclEncoding.PosError:
-		case *hclParser.PosError:
 			e2 := e.(*hclEncoding.PosError)
+			e2.Pos.Filename = file
+		case *hclParser.PosError:
+			e2 := e.(*hclParser.PosError)
 			e2.Pos.Filename = file
 		case *multierror.Error:
 			attachFilenameToPosErrors(file, e.(*multierror.Error))
